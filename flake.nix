@@ -75,6 +75,29 @@
           vulkan-loader
         ];
 
+        # wasm-bindgen-cli with the specific version needed (0.2.97 to match binary)
+        wasm-bindgen-cli-fixed = pkgs.rustPlatform.buildRustPackage {
+          pname = "wasm-bindgen-cli";
+          version = "0.2.97";
+          
+          src = pkgs.fetchCrate {
+            pname = "wasm-bindgen-cli";
+            version = "0.2.97";
+            sha256 = "sha256-DDUdJtjCrGxZV84QcytdxrmS5qvXD8Gcdq4OApj5ktI=";
+          };
+          
+          cargoHash = "sha256-pf0Zyz4ytYzges5yWwwIsEUhyhUt93YceOpFYRO/lQc=";
+          
+          doCheck = false;
+          
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            rustToolchain
+          ];
+
+          buildInputs = systemDeps;
+        };
+        
         # Dioxus CLI via cargo install, without tests
         dioxus-cli = pkgs.rustPlatform.buildRustPackage {
           pname = "dioxus-cli";
@@ -113,6 +136,7 @@
       {
         packages = {
           dioxus-cli = dioxus-cli;
+          wasm-bindgen-cli = wasm-bindgen-cli-fixed;
         };
 
         devShells.default = pkgs.mkShell {
@@ -122,6 +146,9 @@
             
             # Dioxus CLI (try crane build first, then fallback)
             dioxus-cli
+            
+            # wasm-bindgen-cli with the right version
+            wasm-bindgen-cli-fixed
             
             # Cargo tools
             cargo-watch
@@ -151,11 +178,21 @@
             else
               echo "⚠️  dioxus-cli not found in PATH"
             fi
+
+            # Check wasm-bindgen-cli version
+            if command -v wasm-bindgen &> /dev/null; then
+              echo "✅ wasm-bindgen-cli is available: $(wasm-bindgen --version)"
+            else
+              echo "⚠️  wasm-bindgen-cli not found in PATH"
+            fi
             echo ""
             
             # Set up environment variables
             export RUST_LOG=info
             export CARGO_TARGET_DIR="$PWD/target"
+            
+            # Ensure wasm-bindgen-cli is in PATH and takes precedence
+            export PATH="${wasm-bindgen-cli-fixed}/bin:$PATH"
             
             # OpenSSL for Rust
             export OPENSSL_NO_VENDOR=1
