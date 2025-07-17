@@ -1,5 +1,7 @@
 use crate::components::radar_graph::RadarCurve;
+use crate::components::tooltip::Tooltip;
 use crate::components::utils::polar_to_cartesian;
+use dioxus::hooks::use_signal;
 use dioxus::prelude::*;
 use std::f32::consts::PI;
 
@@ -40,8 +42,7 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
         .map(|i| {
             let angle = -PI / 2.0 + i as f32 * axis_angle_step;
             let data_point = &props.curve.data_points[i];
-            let point_radius =
-                props.radius * (data_point.value / props.max_value).clamp(0.0, 1.0);
+            let point_radius = props.radius * (data_point.value / props.max_value).clamp(0.0, 1.0);
             let (x, y) = polar_to_cartesian(point_radius, angle, props.center_x, props.center_y);
             (x, y)
         })
@@ -62,7 +63,6 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
         // Calculate control points for the curve
         // Use a factor of the distance between points for the control point distance
         let curve_factor = 0.3;
-
 
         // Calculate tangent points
         let tangent_angle1 = (-PI / 2.0 + i as f32 * axis_angle_step) % (2.0 * PI) + PI / 2.0;
@@ -93,16 +93,60 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
     // Close the path
     path_data.push('Z');
 
+    // State to track which point is being hovered over
+    let mut hovered_point = use_signal(|| None::<usize>);
+
     // Generate points for each data point
     let point_circles = (0..axes_count).map(|i| {
         let (x, y) = points[i];
+        let index = i;
 
         rsx! {
-            circle {
-                cx: "{x}",
-                cy: "{y}",
-                r: "4",
-                fill: "{props.curve.color}"
+            g {
+                class: "data-point",
+                circle {
+                    cx: "{x}",
+                    cy: "{y}",
+                    r: "4",
+                    fill: "{props.curve.color}",
+                    // Create a slightly larger transparent circle for better hover target
+                    onmouseenter: move |_| {
+                        hovered_point.set(Some(index));
+                    },
+                    onmouseleave: move |_| {
+                        hovered_point.set(None);
+                    }
+                },
+                // Add invisible larger circle to make hovering easier
+                circle {
+                    cx: "{x}",
+                    cy: "{y}",
+                    r: "10",
+                    fill: "transparent",
+                    onmouseenter: move |_| {
+                        hovered_point.set(Some(index));
+                    },
+                    onmouseleave: move |_| {
+                        hovered_point.set(None);
+                    }
+                }
+            }
+        }
+    });
+
+    // Generate tooltips for each data point
+    let tooltips = (0..axes_count).map(|i| {
+        let (x, y) = points[i];
+        let data_point = &props.curve.data_points[i];
+        let is_visible = *hovered_point.read() == Some(i);
+        let tooltip_content = format!("{}: {}", data_point.label, data_point.value);
+
+        rsx! {
+            Tooltip {
+                x: x,
+                y: y,
+                content: tooltip_content,
+                visible: is_visible
             }
         }
     });
@@ -110,15 +154,20 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
     rsx! {
         g {
             class: "radar-curve",
+            // First render the curve path (lowest layer)
             path {
                 d: "{path_data}",
                 fill: "{props.curve.color}",
                 "fill-opacity": "0.3",
                 stroke: "{props.curve.color}",
                 "stroke-width": "2",
-                "stroke-linejoin": "round"
+                "stroke-linejoin": "round",
+                // Ensure the path is below points by setting pointer-events to none
+                "pointer-events": "none"
             }
-            // Add circles for each data point
+            // Add tooltips (middle layer)
+            {tooltips}
+            // Add circles for each data point (top layer to ensure they receive mouse events)
             {point_circles}
         }
     }
