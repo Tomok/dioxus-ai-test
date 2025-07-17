@@ -13,20 +13,18 @@ pub fn RadarLegend(
     let legend_items = curves.iter().enumerate().map(|(index, curve)| {
         // Check if the curve is visible
         let is_visible = match &visible_map {
-            Some(vis_map) => {
-                vis_map
-                    .read()
-                    .iter()
-                    .find(|(name, _)| name == &curve.name)
-                    .map(|(_, vis)| *vis)
-                    .unwrap_or(true)
-            }
+            Some(vis_map) => vis_map
+                .read()
+                .iter()
+                .find(|(name, _)| name == &curve.name)
+                .map(|(_, vis)| *vis)
+                .unwrap_or(true),
             None => true, // Default to visible if no visibility state is provided
         };
 
         // Set up click handler
         let curve_name = curve.name.clone();
-        let on_click = on_click.clone();
+        let on_click = on_click;
         let onclick = move |_| {
             if let Some(handler) = &on_click {
                 handler.call(curve_name.clone());

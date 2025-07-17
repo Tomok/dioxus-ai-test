@@ -1,5 +1,20 @@
-use dioxus::prelude::*;
 use dioxus::hooks::use_signal;
+use dioxus::prelude::*;
+
+/// Data structure for tooltip information
+#[derive(Clone, PartialEq)]
+pub struct TooltipData {
+    /// Index of the curve
+    pub curve_index: usize,
+    /// Label to display in the tooltip
+    pub label: String,
+    /// X-coordinate of the tooltip
+    pub x: f32,
+    /// Y-coordinate of the tooltip
+    pub y: f32,
+    /// Color of the curve
+    pub color: String,
+}
 
 /// A data point for the radar graph.
 /// Each data point represents a value for a specific axis.
@@ -57,7 +72,8 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
     // Initialize visibility state for all curves
     let mut visible_map = use_signal(|| {
         // Start with all curves visible (true)
-        props.curves
+        props
+            .curves
             .iter()
             .map(|curve| (curve.name.clone(), true))
             .collect::<Vec<_>>()
@@ -65,13 +81,18 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
 
     // Update visibility map if curves have changed
     {
-        let current_curve_names: Vec<String> = props.curves.iter().map(|c| c.name.clone()).collect();
-        let existing_names: Vec<String> = visible_map.read().iter().map(|(name, _)| name.clone()).collect();
-        
+        let current_curve_names: Vec<String> =
+            props.curves.iter().map(|c| c.name.clone()).collect();
+        let existing_names: Vec<String> = visible_map
+            .read()
+            .iter()
+            .map(|(name, _)| name.clone())
+            .collect();
+
         // If the curves have changed, update the visibility state
         if current_curve_names != existing_names {
             let mut new_visibility = Vec::new();
-            
+
             for curve in &props.curves {
                 // Try to find existing visibility setting
                 let is_visible = visible_map
@@ -80,10 +101,10 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                     .find(|(name, _)| name == &curve.name)
                     .map(|(_, vis)| *vis)
                     .unwrap_or(true); // Default to visible for new curves
-                
+
                 new_visibility.push((curve.name.clone(), is_visible));
             }
-            
+
             visible_map.set(new_visibility);
         }
     }
@@ -102,7 +123,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
     let on_legend_click = move |name: String| {
         let current_map = visible_map.read().clone();
         let mut new_map = Vec::new();
-        
+
         for (curve_name, is_visible) in current_map {
             if curve_name == name {
                 new_map.push((curve_name, !is_visible)); // Toggle this curve
@@ -110,36 +131,64 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                 new_map.push((curve_name, is_visible)); // Keep state for others
             }
         }
-        
+
         visible_map.set(new_map);
     };
 
+    // Create a shared signal for tooltip state that all curves can access
+    let tooltip_state = use_signal(|| None::<TooltipData>);
+
     // Generate curves for each data set, respecting visibility
-    let curve_components = props.curves.iter().filter_map(|curve| {
-        // Find visibility status for this curve
-        let vis_map = visible_map.read();
-        let is_visible = vis_map
-            .iter()
-            .find(|(name, _)| name == &curve.name)
-            .map(|(_, vis)| *vis)
-            .unwrap_or(true); // Default to visible
-        
-        // Only render if visible
-        if is_visible {
-            Some(rsx! {
-                RadarCurveVisual {
-                    curve: curve.clone(),
-                    axes: props.axes.clone(),
-                    center_x: center_x,
-                    center_y: center_y,
-                    radius: radius,
-                    max_value: props.max_value,
+    let curve_components = props
+        .curves
+        .iter()
+        .enumerate()
+        .filter_map(|(curve_idx, curve)| {
+            // Find visibility status for this curve
+            let vis_map = visible_map.read();
+            let is_visible = vis_map
+                .iter()
+                .find(|(name, _)| name == &curve.name)
+                .map(|(_, vis)| *vis)
+                .unwrap_or(true); // Default to visible
+
+            // Only render if visible
+            if is_visible {
+                Some(rsx! {
+                    RadarCurveVisual {
+                        curve: curve.clone(),
+                        curve_index: curve_idx,
+                        axes: props.axes.clone(),
+                        center_x: center_x,
+                        center_y: center_y,
+                        radius: radius,
+                        max_value: props.max_value,
+                        tooltip_state: tooltip_state,
+                    }
+                })
+            } else {
+                None
+            }
+        });
+
+    // Generate tooltip component based on shared state
+    let tooltip = {
+        use crate::components::tooltip::Tooltip;
+        let tooltip_info = tooltip_state.read();
+
+        if let Some(data) = &*tooltip_info {
+            rsx! {
+                Tooltip {
+                    x: data.x,
+                    y: data.y,
+                    content: data.label.clone(),
+                    visible: true
                 }
-            })
+            }
         } else {
-            None
+            rsx! {}
         }
-    });
+    };
 
     rsx! {
         div {
@@ -176,6 +225,9 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                     visible_map: visible_map,
                     on_click: on_legend_click,
                 }
+
+                // Tooltip at the very top layer
+                {tooltip}
             }
         }
     }
