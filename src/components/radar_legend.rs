@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::components::radar_graph::RadarCurve;
+use dioxus::prelude::*;
 
 #[derive(Props, PartialEq, Clone)]
 pub struct RadarLegendProps {

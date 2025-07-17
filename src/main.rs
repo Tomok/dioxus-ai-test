@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::{RadarGraph, RadarCurve, DataPoint};
+use components::{DataPoint, RadarCurve, RadarGraph};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -34,31 +34,61 @@ fn App() -> Element {
         "Range".to_string(),
         "Durability".to_string(),
     ];
-    
+
     let curve1 = RadarCurve {
         name: "Model A".to_string(),
         color: "#3366CC".to_string(),
         data_points: vec![
-            DataPoint { value: 70.0, label: "Speed".to_string() },
-            DataPoint { value: 85.0, label: "Power".to_string() },
-            DataPoint { value: 65.0, label: "Accuracy".to_string() },
-            DataPoint { value: 90.0, label: "Range".to_string() },
-            DataPoint { value: 75.0, label: "Durability".to_string() },
+            DataPoint {
+                value: 70.0,
+                label: "Speed".to_string(),
+            },
+            DataPoint {
+                value: 85.0,
+                label: "Power".to_string(),
+            },
+            DataPoint {
+                value: 65.0,
+                label: "Accuracy".to_string(),
+            },
+            DataPoint {
+                value: 90.0,
+                label: "Range".to_string(),
+            },
+            DataPoint {
+                value: 75.0,
+                label: "Durability".to_string(),
+            },
         ],
     };
-    
+
     let curve2 = RadarCurve {
         name: "Model B".to_string(),
         color: "#DC3912".to_string(),
         data_points: vec![
-            DataPoint { value: 80.0, label: "Speed".to_string() },
-            DataPoint { value: 65.0, label: "Power".to_string() },
-            DataPoint { value: 90.0, label: "Accuracy".to_string() },
-            DataPoint { value: 70.0, label: "Range".to_string() },
-            DataPoint { value: 85.0, label: "Durability".to_string() },
+            DataPoint {
+                value: 80.0,
+                label: "Speed".to_string(),
+            },
+            DataPoint {
+                value: 65.0,
+                label: "Power".to_string(),
+            },
+            DataPoint {
+                value: 90.0,
+                label: "Accuracy".to_string(),
+            },
+            DataPoint {
+                value: 70.0,
+                label: "Range".to_string(),
+            },
+            DataPoint {
+                value: 85.0,
+                label: "Durability".to_string(),
+            },
         ],
     };
-    
+
     // The `rsx!` macro lets us define HTML inside of rust. It expands to an Element with all of our HTML inside.
     rsx! {
         // In addition to element and text (which we will see later), rsx can contain other components. In this case,
@@ -66,7 +96,7 @@ fn App() -> Element {
         document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         document::Link { rel: "stylesheet", href: TAILWIND_CSS }
-        
+
         div {
             class: "container mx-auto px-4 py-8",
             h1 {

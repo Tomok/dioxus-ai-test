@@ -21,7 +21,7 @@ pub fn RadarGrid(props: RadarGridProps) -> Element {
     let grid_circles = (1..=props.grid_levels).map(|level| {
         let level_radius = props.radius * level as f32 / props.grid_levels as f32;
         let level_value = props.max_value * level as f32 / props.grid_levels as f32;
-        
+
         rsx! {
             circle {
                 cx: "{props.center_x}",

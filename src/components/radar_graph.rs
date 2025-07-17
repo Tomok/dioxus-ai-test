@@ -35,7 +35,7 @@ pub struct RadarGraphProps {
 }
 
 /// RadarGraph component that displays data in a radar chart
-/// 
+///
 /// # Props
 /// - axes: List of axis labels
 /// - curves: List of RadarCurve objects to display
@@ -45,26 +45,24 @@ pub struct RadarGraphProps {
 #[component]
 pub fn RadarGraph(props: RadarGraphProps) -> Element {
     let axes_count = props.axes.len();
-    
+
     // Return early if there are no axes
     if axes_count == 0 {
         return rsx! {
             div { "No axes provided for radar graph" }
         };
     }
-    
+
     let center_x = props.width as f32 / 2.0;
     let center_y = props.height as f32 / 2.0;
     let radius = f32::min(center_x, center_y) * 0.8;
-    
+
     // Import required components
     use crate::components::{
-        radar_axis::RadarAxis,
-        radar_grid::RadarGrid,
-        radar_curve::RadarCurveVisual,
-        radar_legend::RadarLegend
+        radar_axis::RadarAxis, radar_curve::RadarCurveVisual, radar_grid::RadarGrid,
+        radar_legend::RadarLegend,
     };
-    
+
     // Generate curves for each data set
     let curve_components = props.curves.iter().map(|curve| {
         rsx! {
@@ -78,7 +76,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
             }
         }
     });
-    
+
     rsx! {
         div {
             class: "radar-graph-container",
@@ -86,7 +84,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                 width: "{props.width}",
                 height: "{props.height}",
                 view_box: "0 0 {props.width} {props.height}",
-                
+
                 // Grid circles
                 RadarGrid {
                     center_x: center_x,
@@ -94,7 +92,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                     radius: radius,
                     max_value: props.max_value,
                 }
-                
+
                 // Axis lines and labels
                 RadarAxis {
                     labels: props.axes.clone(),
@@ -102,10 +100,10 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                     center_y: center_y,
                     radius: radius,
                 }
-                
+
                 // Curve polygons
                 {curve_components}
-                
+
                 // Legend
                 RadarLegend {
                     curves: props.curves.clone(),
