@@ -12,6 +12,3 @@ mod utils;
 
 // Export the main component and data structures
 pub use radar_graph::{DataPoint, RadarCurve, RadarGraph};
-
-// Export individual components for advanced usage
-pub mod radar_components {}
