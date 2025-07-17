@@ -91,3 +91,4 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
 - The `flake.nix` file contains a custom build of wasm-bindgen-cli version 0.2.97 to ensure compatibility.
 
 - All code should be formatted using `cargo fmt` before committing.
+- Run `cargo clippy` before committing to check for and fix any code issues.

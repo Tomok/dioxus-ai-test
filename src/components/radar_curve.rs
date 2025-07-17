@@ -1,4 +1,4 @@
-use crate::components::radar_graph::{DataPoint, RadarCurve};
+use crate::components::radar_graph::RadarCurve;
 use crate::components::utils::polar_to_cartesian;
 use dioxus::prelude::*;
 use std::f32::consts::PI;
@@ -41,7 +41,7 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
             let angle = -PI / 2.0 + i as f32 * axis_angle_step;
             let data_point = &props.curve.data_points[i];
             let point_radius =
-                props.radius * (data_point.value / props.max_value).min(1.0).max(0.0);
+                props.radius * (data_point.value / props.max_value).clamp(0.0, 1.0);
             let (x, y) = polar_to_cartesian(point_radius, angle, props.center_x, props.center_y);
             (x, y)
         })
@@ -63,9 +63,6 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
         // Use a factor of the distance between points for the control point distance
         let curve_factor = 0.3;
 
-        // Angle between points
-        let mid_angle =
-            (-PI / 2.0 + i as f32 * axis_angle_step + axis_angle_step / 2.0) % (2.0 * PI);
 
         // Calculate tangent points
         let tangent_angle1 = (-PI / 2.0 + i as f32 * axis_angle_step) % (2.0 * PI) + PI / 2.0;

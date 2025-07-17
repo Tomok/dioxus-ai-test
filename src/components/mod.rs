@@ -14,8 +14,4 @@ pub use radar_graph::{DataPoint, RadarCurve, RadarGraph};
 
 // Export individual components for advanced usage
 pub mod radar_components {
-    pub use super::radar_axis::RadarAxis;
-    pub use super::radar_curve::RadarCurveVisual;
-    pub use super::radar_grid::RadarGrid;
-    pub use super::radar_legend::RadarLegend;
 }
