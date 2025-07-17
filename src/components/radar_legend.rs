@@ -1,32 +1,65 @@
 use crate::components::radar_graph::RadarCurve;
 use dioxus::prelude::*;
 
-#[derive(Props, PartialEq, Clone)]
-pub struct RadarLegendProps {
-    /// List of curves to display in the legend
-    pub curves: Vec<RadarCurve>,
-    /// X position of the legend
-    pub x: f32,
-    /// Y position of the legend
-    pub y: f32,
-}
-
-/// Component for rendering the legend of a radar graph
 #[component]
-pub fn RadarLegend(props: RadarLegendProps) -> Element {
-    let legend_items = props.curves.iter().enumerate().map(|(index, curve)| {
+pub fn RadarLegend(
+    curves: Vec<RadarCurve>,
+    x: f32,
+    y: f32,
+    #[props(optional)] visible_map: Option<Signal<Vec<(String, bool)>>>,
+    #[props(optional)] on_click: Option<EventHandler<String>>,
+) -> Element {
+    // Create legend items with click handling
+    let legend_items = curves.iter().enumerate().map(|(index, curve)| {
+        // Check if the curve is visible
+        let is_visible = match &visible_map {
+            Some(vis_map) => {
+                vis_map
+                    .read()
+                    .iter()
+                    .find(|(name, _)| name == &curve.name)
+                    .map(|(_, vis)| *vis)
+                    .unwrap_or(true)
+            }
+            None => true, // Default to visible if no visibility state is provided
+        };
+
+        // Set up click handler
+        let curve_name = curve.name.clone();
+        let on_click = on_click.clone();
+        let onclick = move |_| {
+            if let Some(handler) = &on_click {
+                handler.call(curve_name.clone());
+            }
+        };
+
+        // Apply styling based on visibility
+        let text_style = if is_visible {
+            "font-size: 12px; cursor: pointer;"
+        } else {
+            "font-size: 12px; cursor: pointer; text-decoration: line-through; opacity: 0.7;"
+        };
+
+        let rect_style = if is_visible {
+            "cursor: pointer;"
+        } else {
+            "cursor: pointer; opacity: 0.3;"
+        };
+
         rsx! {
             g {
                 transform: "translate(0, {index as u32 * 20})",
+                onclick: onclick,
                 rect {
                     width: "15",
                     height: "15",
-                    fill: "{curve.color}"
+                    fill: "{curve.color}",
+                    style: "{rect_style}"
                 }
                 text {
                     x: "20",
                     y: "12",
-                    "font-size": "12px",
+                    style: "{text_style}",
                     "{curve.name}"
                 }
             }
@@ -36,7 +69,7 @@ pub fn RadarLegend(props: RadarLegendProps) -> Element {
     rsx! {
         g {
             class: "legend",
-            transform: "translate({props.x}, {props.y})",
+            transform: "translate({x}, {y})",
             {legend_items}
         }
     }
