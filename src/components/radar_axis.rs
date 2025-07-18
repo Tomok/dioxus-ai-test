@@ -55,7 +55,8 @@ pub fn RadarAxis(props: RadarAxisProps) -> Element {
                 y1: "{props.center_y}",
                 x2: "{end_x}",
                 y2: "{end_y}",
-                class: "stroke-axis dark:stroke-gray-500",
+                stroke: "#888888",
+                class: "dark:stroke-gray-500",
                 "stroke-width": "1"
             }
             text {
@@ -64,7 +65,8 @@ pub fn RadarAxis(props: RadarAxisProps) -> Element {
                 "text-anchor": "{text_anchor}",
                 dy: "{dy}",
                 "font-size": "12px",
-                class: "fill-text dark:fill-gray-200",
+                fill: "#333333",
+                class: "dark:fill-gray-200",
                 "{props.labels[i]}"
             }
         }
