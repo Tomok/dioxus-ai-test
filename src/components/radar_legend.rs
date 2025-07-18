@@ -33,9 +33,9 @@ pub fn RadarLegend(
 
         // Apply styling based on visibility
         let text_style = if is_visible {
-            "font-size: 12px; cursor: pointer;"
+            "font-size: 12px; cursor: pointer; fill: currentColor; text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);"
         } else {
-            "font-size: 12px; cursor: pointer; text-decoration: line-through; opacity: 0.7;"
+            "font-size: 12px; cursor: pointer; fill: currentColor; text-decoration: line-through; opacity: 0.7; text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);"
         };
 
         let rect_style = if is_visible {
@@ -57,6 +57,7 @@ pub fn RadarLegend(
                 text {
                     x: "20",
                     y: "12",
+                    class: "text-text dark:text-white",
                     style: "{text_style}",
                     "{curve.name}"
                 }

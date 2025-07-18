@@ -37,8 +37,7 @@ pub fn RadarGrid(props: RadarGridProps) -> Element {
                 y: "{props.center_y - level_radius}",
                 "text-anchor": "middle",
                 "font-size": "10px",
-                fill: "#999999",
-                class: "dark:fill-gray-400",
+                class: "fill-gray-600 dark:fill-gray-300 font-medium dark:font-semibold",
                 "{level_value}"
             }
         }
