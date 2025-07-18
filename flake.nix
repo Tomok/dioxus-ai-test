@@ -158,6 +158,9 @@
             nodejs_20
             nodePackages.npm
             
+            # Tailwind CSS and related tools
+            nodePackages.tailwindcss
+            
             # System dependencies
           ] ++ systemDeps;
 
@@ -170,6 +173,10 @@
             echo "  dx serve      - Serve the project with hot reloading"
             echo "  dx build      - Build the project"
             echo "  dx --help     - Show all available commands"
+            echo ""
+            echo "Tailwind CSS commands:"
+            echo "  npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch  - Watch and compile Tailwind CSS"
+            echo "  npm run tailwind  - Same as above, using npm script"
             echo ""
             
             # Check if dx is available
