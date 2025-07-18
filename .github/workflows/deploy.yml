@@ -27,16 +27,32 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      - name: Install Dioxus CLI
-        run: cargo install dioxus-cli --locked
+      # Cache Rust dependencies
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          
+      # Cache cargo binaries
+      - name: Cache cargo binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
 
+      # The '|| true' ensures the command succeeds even if the binary is already installed from cache
+      # Without this, the workflow would fail when trying to install an already existing binary
+      - name: Install Dioxus CLI
+        run: cargo install dioxus-cli --locked || true
+
+      # Same here - '|| true' prevents failure if wasm-bindgen-cli is already in the cache
       - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli --version 0.2.97 --locked
+        run: cargo install wasm-bindgen-cli --version 0.2.97 --locked || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
           
       - name: Install npm dependencies
         run: npm install
