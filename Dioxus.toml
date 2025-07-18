@@ -5,6 +5,9 @@
 # HTML title tag content
 title = "radar-graph"
 
+# Base path for GitHub Pages (must match repository name)
+base_path = "dioxus-ai-test"
+
 # include `assets` in web platform
 [web.resource]
 
