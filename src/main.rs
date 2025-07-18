@@ -90,6 +90,43 @@ fn App() -> Element {
     };
 
     // The `rsx!` macro lets us define HTML inside of rust. It expands to an Element with all of our HTML inside.
+    // Initialize dark mode on load
+    use_effect(|| {
+        let script = r#"
+        // Check for color theme preference and apply it
+        function applyTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                console.log('Dark theme applied');
+            } else {
+                document.documentElement.classList.remove('dark');
+                console.log('Light theme applied');
+            }
+        }
+        
+        // Apply theme immediately
+        applyTheme();
+        
+        // Listen for system preference changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (!localStorage.theme) {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                    console.log('System theme changed to dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    console.log('System theme changed to light');
+                }
+            }
+        });
+        "#;
+        
+        let _ = web_sys::window().and_then(|_| {
+            let _ = js_sys::eval(script);
+            Some(())
+        });
+    });
+
     rsx! {
         // In addition to element and text (which we will see later), rsx can contain other components. In this case,
         // we are using the `document::Link` component to add a link to our favicon and main CSS file into the head of our app.
@@ -98,10 +135,60 @@ fn App() -> Element {
         document::Link { rel: "stylesheet", href: TAILWIND_CSS }
 
         div {
-            class: "container mx-auto px-4 py-8",
-            h1 {
-                class: "text-3xl font-bold mb-6 text-center",
-                "Radar Graph Demo"
+            class: "container mx-auto px-4 py-8 bg-background dark:bg-gray-900 text-text dark:text-white min-h-screen transition-colors duration-300",
+            div {
+                class: "flex justify-between items-center mb-6",
+                h1 {
+                    class: "text-3xl font-bold",
+                    "Radar Graph Demo"
+                }
+                div {
+                    class: "flex gap-2 items-center",
+                    button {
+                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+                        onclick: move |_| {
+                            let script = r#"
+                                localStorage.theme = 'light'; 
+                                document.documentElement.classList.remove('dark');
+                                console.log('Light mode activated');
+                            "#;
+                            let _ = js_sys::eval(script);
+                        },
+                        title: "Light mode",
+                        "☀️"
+                    }
+                    button {
+                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+                        onclick: move |_| {
+                            let script = r#"
+                                localStorage.removeItem('theme'); 
+                                if (window.matchMedia('(prefers-color-scheme: dark)').matches) { 
+                                    document.documentElement.classList.add('dark');
+                                    console.log('System theme (dark) activated'); 
+                                } else { 
+                                    document.documentElement.classList.remove('dark');
+                                    console.log('System theme (light) activated');
+                                }
+                            "#;
+                            let _ = js_sys::eval(script);
+                        },
+                        title: "System preference",
+                        "🌓"
+                    }
+                    button {
+                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+                        onclick: move |_| {
+                            let script = r#"
+                                localStorage.theme = 'dark'; 
+                                document.documentElement.classList.add('dark');
+                                console.log('Dark mode activated');
+                            "#;
+                            let _ = js_sys::eval(script);
+                        },
+                        title: "Dark mode",
+                        "🌙"
+                    }
+                }
             }
             div {
                 class: "flex justify-center",

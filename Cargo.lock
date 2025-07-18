@@ -3288,7 +3288,10 @@ name = "radar-graph"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "js-sys",
+ "log",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

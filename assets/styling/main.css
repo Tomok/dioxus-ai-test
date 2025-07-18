@@ -1,8 +1,16 @@
+/* Light mode (default) */
 body {
-    background-color: #0f1116;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #333333;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode - applied when .dark class is present on html */
+.dark body {
+    background-color: #0f1116;
+    color: #ffffff;
 }
 
 #hero {
@@ -17,22 +25,36 @@ body {
     width: 400px;
     text-align: left;
     font-size: x-large;
-    color: white;
     display: flex;
     flex-direction: column;
 }
 
 #links a {
-    color: white;
     text-decoration: none;
     margin-top: 20px;
     margin: 10px 0px;
-    border: white 1px solid;
     border-radius: 5px;
     padding: 10px;
 }
 
+/* Light mode link styling */
+#links a {
+    color: #333333;
+    border: #333333 1px solid;
+}
+
 #links a:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+/* Dark mode link styling */
+.dark #links a {
+    color: white;
+    border: white 1px solid;
+}
+
+.dark #links a:hover {
     background-color: #1f1f1f;
     cursor: pointer;
 }

@@ -37,13 +37,13 @@ pub fn Tooltip(props: TooltipProps) -> Element {
                 height: "20",
                 rx: "3",
                 ry: "3",
-                fill: "#333",
+                class: "fill-tooltip-bg dark:fill-gray-800",
                 opacity: "0.8",
             }
             text {
                 x: "{tooltip_x}",
                 y: "{tooltip_y - 12.0}",
-                fill: "white",
+                class: "fill-tooltip-text dark:fill-white",
                 "text-anchor": "middle",
                 "font-size": "12",
                 "{props.content}"
