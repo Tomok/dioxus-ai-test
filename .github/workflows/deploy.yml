@@ -62,6 +62,9 @@ jobs:
         
       - name: Build Dioxus App
         run: dx build --release
+        
+      - name: Add 404.html for client-side routing
+        run: cp target/dx/radar-graph/release/web/public/index.html target/dx/radar-graph/release/web/public/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
