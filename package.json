@@ -1,0 +1,12 @@
+{
+  "name": "radar-graph",
+  "version": "1.0.0",
+  "description": "Dioxus-based radar graph visualization",
+  "scripts": {
+    "tailwind": "tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch",
+    "build:tailwind": "tailwindcss -i ./tailwind.css -o ./assets/tailwind.css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}
