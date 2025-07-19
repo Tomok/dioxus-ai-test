@@ -20,8 +20,12 @@ The project uses Nix Flakes for dependency management and development environmen
    ```
    This will set up the environment with all required dependencies including Rust, dioxus-cli, and wasm-bindgen-cli.
 
-2. **Install Tailwind CSS** (if not using Nix):
+2. **Run Tailwind CSS**:
    ```bash
+   # When using Nix environment:
+   tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+   
+   # If not using Nix:
    npm install
    npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
    ```
@@ -59,6 +63,10 @@ The project uses Nix Flakes for dependency management and development environmen
 
 When making UI changes, run the Tailwind CSS compiler to automatically update the CSS:
 ```bash
+# When using Nix environment:
+tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+
+# If not using Nix:
 npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
 ```
 
