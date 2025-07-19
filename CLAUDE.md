@@ -23,12 +23,14 @@ The project uses Nix Flakes for dependency management and development environmen
 2. **Run Tailwind CSS**:
    ```bash
    # When using Nix environment:
-   tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+   tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
    
    # If not using Nix:
    npm install
-   npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+   npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
    ```
+   
+   Note: For development, you might  request the user to use the command with the `--watch` flag in a separate terminal. But it should never be run by Claude.
 
 ### Development Commands
 
@@ -61,14 +63,16 @@ The project uses Nix Flakes for dependency management and development environmen
 
 ### Tailwind CSS Development
 
-When making UI changes, run the Tailwind CSS compiler to automatically update the CSS:
+When making UI changes, you can compile the CSS once without watching for changes:
 ```bash
 # When using Nix environment:
-tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 
 # If not using Nix:
-npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
+npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 ```
+
+**IMPORTANT NOTE**: Never use the `--watch` parameter with Tailwind commands and never run `dx serve` when using Claude. These commands are run in separate terminal sessions.
 
 ## Project Architecture
 
@@ -100,3 +104,9 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
 
 - All code should be formatted using `cargo fmt` before committing.
 - Run `cargo clippy` before committing to check for and fix any code issues.
+
+### Claude Code Instructions
+
+- When working with Claude Code, DO NOT use `--watch` parameter for Tailwind or run `dx serve` commands. These commands are run in separate terminal sessions.
+- For checking build errors, use `dx build` or `dx bundle` instead of `dx serve`.
+- For applying Tailwind changes, run the command without the watch flag (`tailwindcss -i ./tailwind.css -o ./assets/tailwind.css`).
