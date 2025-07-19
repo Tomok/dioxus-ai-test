@@ -127,3 +127,4 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 - When working with Claude Code, DO NOT use `--watch` parameter for Tailwind or run `dx serve` commands. These commands are run in separate terminal sessions.
 - For checking build errors, use `dx build` or `dx bundle` instead of `dx serve`.
 - For applying Tailwind changes, run the command without the watch flag (`tailwindcss -i ./tailwind.css -o ./assets/tailwind.css`).
+- run all commands that rely on tools installed via nix with `nix develop --command ` to ensure the latest version of flake.nix is used
