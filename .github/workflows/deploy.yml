@@ -22,46 +22,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+      # Setup and cache Nix
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
         with:
-          targets: wasm32-unknown-unknown
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      # Cache Rust dependencies
+      # Cache Nix store to speed up builds
+      - name: Cache Nix store
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      # Cache Rust build artifacts
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+
+      # Enter the Nix development environment and build
+      - name: Build with Nix
+        run: |
+          # Build Tailwind CSS
+          nix develop --command tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
           
-      # Cache cargo binaries
-      - name: Cache cargo binaries
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin
-          key: ${{ runner.os }}-cargo-bin-${{ hashFiles('**/Cargo.lock') }}
-
-      # The '|| true' ensures the command succeeds even if the binary is already installed from cache
-      # Without this, the workflow would fail when trying to install an already existing binary
-      - name: Install Dioxus CLI
-        run: cargo install dioxus-cli --locked || true
-
-      # Same here - '|| true' prevents failure if wasm-bindgen-cli is already in the cache
-      - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli --version 0.2.97 --locked || true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install npm dependencies
-        run: npm install
-
-      - name: Build Tailwind CSS
-        run: npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
-        
-      - name: Build Dioxus App
-        run: dx build --release
+          # Build Dioxus App
+          nix develop --command dx build --release
         
       - name: Add 404.html for client-side routing
         run: cp target/dx/radar-graph/release/web/public/index.html target/dx/radar-graph/release/web/public/404.html
