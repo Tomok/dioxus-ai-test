@@ -4,6 +4,7 @@
 
 mod radar_axis;
 mod radar_curve;
+mod radar_container;
 mod radar_graph;
 mod radar_grid;
 mod radar_legend;
@@ -12,3 +13,4 @@ mod utils;
 
 // Export the main component and data structures
 pub use radar_graph::{DataPoint, RadarCurve, RadarGraph};
+pub use radar_container::RadarContainer;

@@ -2,7 +2,7 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::{DataPoint, RadarCurve, RadarGraph};
+use components::{DataPoint, RadarCurve, RadarContainer};
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -190,9 +190,10 @@ fn App() -> Element {
                     }
                 }
             }
+            // Responsive radar graph container
             div {
-                class: "flex justify-center",
-                RadarGraph {
+                class: "container mx-auto",
+                RadarContainer {
                     axes: axes,
                     curves: vec![curve1, curve2],
                     max_value: 100.0,
