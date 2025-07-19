@@ -34,6 +34,22 @@ jobs:
       - name: Cache Nix store
         uses: DeterminateSystems/magic-nix-cache-action@v2
 
+      # Cache the Nix developer environment
+      - name: Cache Nix develop dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/nix/derivations
+            ~/.cache/nix/eval-cache
+            ~/.nix-profile
+          key: ${{ runner.os }}-nix-develop-${{ hashFiles('**/flake.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-nix-develop-
+
+      # Pre-warm the nix develop environment
+      - name: Prepare Nix developer environment
+        run: nix develop --command echo "Nix environment is ready"
+
       # Cache Rust build artifacts
       - uses: Swatinem/rust-cache@v2
         with:
