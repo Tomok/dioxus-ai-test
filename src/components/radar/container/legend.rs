@@ -1,4 +1,4 @@
-use crate::components::radar_graph::RadarCurve;
+use super::graph::radar::RadarCurve;
 use dioxus::prelude::*;
 
 /// Props for the RadarLegend component

@@ -1,5 +1,16 @@
 use dioxus::hooks::use_signal;
 use dioxus::prelude::*;
+use crate::components::tooltip::Tooltip;
+
+// Import components
+use self::axis::RadarAxis;
+use self::curve::RadarCurveVisual;
+use self::grid::RadarGrid;
+
+// Component modules
+pub mod axis;
+pub mod curve;
+pub mod grid;
 
 /// Data structure for tooltip information
 #[derive(Clone, PartialEq)]
@@ -73,11 +84,6 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
     let center_y = props.height as f32 / 2.0;
     let radius = f32::min(center_x, center_y) * 0.8;
 
-    // Import required components
-    use crate::components::{
-        radar_axis::RadarAxis, radar_curve::RadarCurveVisual, radar_grid::RadarGrid,
-    };
-
     // Create a shared signal for tooltip state that all curves can access
     let tooltip_state = use_signal(|| None::<TooltipData>);
 
@@ -103,7 +109,6 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
 
     // Generate tooltip component based on shared state
     let tooltip = {
-        use crate::components::tooltip::Tooltip;
         let tooltip_info = tooltip_state.read();
 
         if let Some(data) = &*tooltip_info {

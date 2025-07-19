@@ -2,7 +2,8 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::{DataPoint, RadarCurve, RadarContainer};
+use components::radar::{DataPoint, RadarCurve};
+use components::radar::container::RadarContainer;
 
 /// Define a components module that contains all shared components for our app.
 mod components;

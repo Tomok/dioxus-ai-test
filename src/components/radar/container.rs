@@ -1,7 +1,12 @@
 use dioxus::prelude::*;
-use crate::components::{RadarCurve, RadarGraph};
-use crate::components::radar_legend::RadarLegend;
 use dioxus::hooks::use_signal;
+
+/// Submodules containing components directly used by the container
+pub mod graph;
+pub mod legend;
+
+use graph::radar::{RadarCurve, RadarGraph};
+use legend::RadarLegend;
 
 /// Props for the RadarContainer component
 #[derive(Props, PartialEq, Clone)]

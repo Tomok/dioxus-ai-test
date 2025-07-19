@@ -105,6 +105,23 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 - All code should be formatted using `cargo fmt` before committing.
 - Run `cargo clippy` before committing to check for and fix any code issues.
 
+### Rust Code Style and Structure
+
+#### Module Organization
+
+1. **File Structure**:
+   - Use `<module>.rs` files instead of `<module>/mod.rs` files for module organization
+   - Example: Prefer `src/components/radar/axis.rs` over `src/components/radar/axis/mod.rs`
+
+2. **Module Hierarchy**:
+   - Structure modules to reflect component relationships and usage patterns
+   - Place subcomponents under their parent component's module
+   - Example: `axis`, `curve`, and `grid` components are submodules of `radar` since they're only used within the radar component
+
+3. **Imports and Exports**:
+   - Use `self::` for clarity when importing from submodules
+   - Re-export components at the appropriate level based on their usage
+
 ### Claude Code Instructions
 
 - When working with Claude Code, DO NOT use `--watch` parameter for Tailwind or run `dx serve` commands. These commands are run in separate terminal sessions.
