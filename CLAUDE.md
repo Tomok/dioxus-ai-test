@@ -86,9 +86,9 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch
 
 ### Special Notes
 
-- The project requires a specific version of wasm-bindgen (0.2.97) to ensure compatibility with the installed wasm-bindgen-cli. This is handled by the Nix flake but should be considered when modifying dependencies.
+- The wasm-bindgen version in Cargo.toml must match the wasm-bindgen-cli version provided by the Nix flake. Currently using version 0.2.100. When updating the Nix flake's wasm-bindgen-cli version, ensure you also update the wasm-bindgen dependency in Cargo.toml to match.
 
-- The `flake.nix` file contains a custom build of wasm-bindgen-cli version 0.2.97 to ensure compatibility.
+- The `flake.nix` file uses nixpkgs versions of both dioxus-cli and wasm-bindgen-cli for better maintainability.
 
 - All code should be formatted using `cargo fmt` before committing.
 - Run `cargo clippy` before committing to check for and fix any code issues.

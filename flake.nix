@@ -78,68 +78,13 @@
           vulkan-loader
         ];
 
-        # wasm-bindgen-cli with the specific version needed (0.2.97 to match binary)
-        wasm-bindgen-cli-fixed = pkgs.rustPlatform.buildRustPackage {
-          pname = "wasm-bindgen-cli";
-          version = "0.2.97";
-          
-          src = pkgs.fetchCrate {
-            pname = "wasm-bindgen-cli";
-            version = "0.2.97";
-            sha256 = "sha256-DDUdJtjCrGxZV84QcytdxrmS5qvXD8Gcdq4OApj5ktI=";
-          };
-          
-          cargoHash = "sha256-pf0Zyz4ytYzges5yWwwIsEUhyhUt93YceOpFYRO/lQc=";
-          
-          doCheck = false;
-          
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-            rustToolchain
-          ];
-
-          buildInputs = systemDeps;
-        };
-        
-        # Dioxus CLI via cargo install, without tests
-        dioxus-cli = pkgs.rustPlatform.buildRustPackage {
-          pname = "dioxus-cli";
-          version = "0.6.0";
-          
-          src = pkgs.fetchCrate {
-            pname = "dioxus-cli";
-            version = "0.6.0";
-            sha256 = "sha256-0Kg2/+S8EuMYZQaK4Ao+mbS7K48VhVWjPL+LnoVJMSw=";
-          };
-          
-          cargoHash = "sha256-uD3AHHY3edpqyQ8gnsTtxQsen8UzyVIbArSvpMa+B+8=";
-          
-          # Skip tests completely
-          doCheck = false;
-          
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-            rustToolchain
-          ];
-
-          buildInputs = systemDeps;
-
-          # Environment variables for the build
-          OPENSSL_NO_VENDOR = "1";
-          OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
-          OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-          
-          # Add CA certificates path
-          SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-          NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-        };
 
 
       in
       {
         packages = {
-          dioxus-cli = dioxus-cli;
-          wasm-bindgen-cli = wasm-bindgen-cli-fixed;
+          dioxus-cli = pkgs.dioxus-cli;
+          wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
         };
 
         devShells.default = pkgs.mkShell {
@@ -147,11 +92,11 @@
             # Rust toolchain with wasm32-unknown-unknown target
             rustToolchain
             
-            # Dioxus CLI (try crane build first, then fallback)
+            # Dioxus CLI
             dioxus-cli
             
-            # wasm-bindgen-cli with the right version
-            wasm-bindgen-cli-fixed
+            # wasm-bindgen-cli
+            wasm-bindgen-cli
             
             # Cargo tools
             cargo-watch
@@ -211,8 +156,6 @@
             export RUST_LOG=info
             export CARGO_TARGET_DIR="$PWD/target"
             
-            # Ensure wasm-bindgen-cli is in PATH and takes precedence
-            export PATH="${wasm-bindgen-cli-fixed}/bin:$PATH"
             
             # OpenSSL for Rust
             export OPENSSL_NO_VENDOR=1
