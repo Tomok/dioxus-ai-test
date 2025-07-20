@@ -38,7 +38,7 @@ pub fn RadarLegend(props: RadarLegendProps) -> Element {
 
         // Set up click handler
         let curve_name = curve.name.clone();
-        let on_click = props.on_click.clone();
+        let on_click = props.on_click;
         let onclick = move |_| {
             if let Some(handler) = &on_click {
                 handler.call(curve_name.clone());

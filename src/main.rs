@@ -124,9 +124,8 @@ fn App() -> Element {
         });
         "#;
 
-        let _ = web_sys::window().and_then(|_| {
+        let _ = web_sys::window().map(|_| {
             let _ = js_sys::eval(script);
-            Some(())
         });
     });
 
