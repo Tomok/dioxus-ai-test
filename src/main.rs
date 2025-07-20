@@ -2,9 +2,9 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::radar::{DataPoint, RadarCurve};
 use components::radar::container::RadarContainer;
-use components::utils::ThemeButtons;
+use components::radar::{DataPoint, RadarCurve};
+use components::theme_buttons::ThemeButtons;
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -123,7 +123,7 @@ fn App() -> Element {
             }
         });
         "#;
-        
+
         let _ = web_sys::window().and_then(|_| {
             let _ = js_sys::eval(script);
             Some(())
@@ -145,7 +145,7 @@ fn App() -> Element {
                     class: "text-3xl font-bold",
                     "Radar Graph Demo"
                 }
-                
+
                 // Theme buttons component will be empty on non-web platforms
                 ThemeButtons {}
             }

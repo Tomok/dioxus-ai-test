@@ -3,6 +3,7 @@
 //! RadarGraph component to be used in our app.
 
 pub mod radar;
+pub mod theme_buttons;
 pub mod tooltip;
 pub mod utils;
 
