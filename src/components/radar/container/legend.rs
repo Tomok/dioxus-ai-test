@@ -52,11 +52,14 @@ pub fn RadarLegend(props: RadarLegendProps) -> Element {
             format!("translate(0, {})", index as u32 * 20)
         };
 
-        // Determine text classes based on visibility
-        let text_classes = if is_visible {
-            "text-xs cursor-pointer text-text dark:text-white"
+        // Determine text classes and styles based on visibility
+        let (text_classes, text_style) = if is_visible {
+            ("text-xs cursor-pointer", "fill: currentColor;")
         } else {
-            "text-xs cursor-pointer text-text dark:text-white line-through opacity-70"
+            (
+                "text-xs cursor-pointer line-through opacity-70",
+                "fill: currentColor;",
+            )
         };
 
         // Determine rectangle classes based on visibility
@@ -80,6 +83,7 @@ pub fn RadarLegend(props: RadarLegendProps) -> Element {
                     x: "20",
                     y: "12",
                     class: "{text_classes}",
+                    style: "{text_style}",
                     "{curve.name}"
                 }
             }
@@ -88,7 +92,7 @@ pub fn RadarLegend(props: RadarLegendProps) -> Element {
 
     rsx! {
         div {
-            class: "legend-container",
+            class: "legend-container text-gray-800 dark:text-white",
             svg {
                 // Adjust width based on layout
                 width: if props.layout == "horizontal" { "100%" } else { "150px" },
