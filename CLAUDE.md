@@ -102,9 +102,6 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 
 - The `flake.nix` file uses nixpkgs versions of both dioxus-cli and wasm-bindgen-cli for better maintainability.
 
-- All code should be formatted using `cargo fmt` before committing.
-- Run `cargo clippy` before committing to check for and fix any code issues.
-
 ### Rust Code Style and Structure
 
 #### Module Organization
@@ -127,4 +124,13 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
 - When working with Claude Code, DO NOT use `--watch` parameter for Tailwind or run `dx serve` commands. These commands are run in separate terminal sessions.
 - For checking build errors, use `dx build` or `dx bundle` instead of `dx serve`.
 - For applying Tailwind changes, run the command without the watch flag (`tailwindcss -i ./tailwind.css -o ./assets/tailwind.css`).
-- run all commands that rely on tools installed via nix with `nix develop --command ` to ensure the latest version of flake.nix is used
+- Run all commands that rely on tools installed via nix with `nix develop --command ` to ensure the latest version of flake.nix is used
+- **MANDATORY BEFORE COMMITTING**: Always run these commands before committing any code changes:
+  ```bash
+  # Format all Rust code
+  nix develop --command cargo fmt
+  
+  # Check for clippy issues using - than evaluate and fix them
+  nix develop --command cargo clippy
+  ```
+  These commands are REQUIRED and must be run before any commit. Never commit code without formatting and fixing all clippy issues.
