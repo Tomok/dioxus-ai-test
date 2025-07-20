@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use dioxus::hooks::use_signal;
+use dioxus::prelude::*;
 
 /// Submodules containing components directly used by the container
 pub mod graph;
@@ -27,7 +27,7 @@ pub struct RadarContainerProps {
 }
 
 /// A responsive container for the radar graph and legend
-/// 
+///
 /// This component handles the responsive layout of the radar graph and legend,
 /// placing them side by side on larger screens and stacking them on smaller screens.
 /// It also manages the visibility state shared between the graph and legend.
@@ -45,7 +45,8 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
 
     // Update visibility map if curves have changed
     {
-        let current_curve_names: Vec<String> = props.curves.iter().map(|c| c.name.clone()).collect();
+        let current_curve_names: Vec<String> =
+            props.curves.iter().map(|c| c.name.clone()).collect();
         let existing_names: Vec<String> = visible_map
             .read()
             .iter()
@@ -89,26 +90,30 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
     };
 
     // Filter curves based on visibility for the graph
-    let visible_curves = props.curves.iter().filter_map(|curve| {
-        let is_visible = visible_map
-            .read()
-            .iter()
-            .find(|(name, _)| name == &curve.name)
-            .map(|(_, vis)| *vis)
-            .unwrap_or(true);
+    let visible_curves = props
+        .curves
+        .iter()
+        .filter_map(|curve| {
+            let is_visible = visible_map
+                .read()
+                .iter()
+                .find(|(name, _)| name == &curve.name)
+                .map(|(_, vis)| *vis)
+                .unwrap_or(true);
 
-        if is_visible {
-            Some(curve.clone())
-        } else {
-            None
-        }
-    }).collect::<Vec<_>>();
+            if is_visible {
+                Some(curve.clone())
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
 
     rsx! {
         div {
             // Responsive container that changes from column on small screens to row on medium and larger screens
             class: "flex flex-col md:flex-row justify-center items-center md:items-start gap-4",
-            
+
             // Graph container
             div {
                 class: "flex-shrink-0",
@@ -120,7 +125,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
                     height: props.height,
                 }
             }
-            
+
             // Legend container - positioned below on mobile, to the right on desktop
             div {
                 class: "p-4 flex-shrink-0",

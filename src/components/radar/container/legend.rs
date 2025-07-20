@@ -18,7 +18,7 @@ pub struct RadarLegendProps {
 }
 
 /// A standalone legend component for the radar graph
-/// 
+///
 /// This component can be positioned independently of the radar graph
 /// and can be displayed in either horizontal or vertical layout.
 #[component]

@@ -40,20 +40,20 @@
           openssl
           cacert
           cmake
-          
+
           # For web development
           wasm-pack
           binaryen
-          
+
           # For Linux desktop apps
           gtk3
           webkitgtk_4_1
           libappindicator-gtk3
-          
+
           # For audio/video (optional)
           alsa-lib
           libpulseaudio
-          
+
           # Build tools
           gcc
           libiconv
@@ -93,27 +93,27 @@
           buildInputs = with pkgs; [
             # Rust toolchain with wasm32-unknown-unknown target
             rustToolchain
-            
+
             # Dioxus CLI
             dioxus-cli
-            
+
             # wasm-bindgen-cli
             wasm-bindgen-cli
-            
+
             # Cargo tools
             cargo-watch
             cargo-edit
-            
+
             # Development tools
             nodejs_20
             nodePackages.npm
-            
+
             # Tailwind CSS and related tools
             nodePackages.tailwindcss
-            
+
             # Claude Code CLI
             claude-code
-            
+
             # System dependencies
           ] ++ systemDeps;
 
@@ -181,7 +181,7 @@
           OPENSSL_NO_VENDOR = "1";
           OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
           OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-          
+
           # Add CA certificates path
           SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
