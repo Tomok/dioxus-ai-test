@@ -20,6 +20,9 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
           inherit system overlays;
+          config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
+            "claude-code"
+          ];
         };
 
         # Rust toolchain with wasm32-unknown-unknown target
@@ -161,6 +164,9 @@
             # Tailwind CSS and related tools
             nodePackages.tailwindcss
             
+            # Claude Code CLI
+            claude-code
+            
             # System dependencies
           ] ++ systemDeps;
 
@@ -191,6 +197,13 @@
               echo "✅ wasm-bindgen-cli is available: $(wasm-bindgen --version)"
             else
               echo "⚠️  wasm-bindgen-cli not found in PATH"
+            fi
+
+            # Check claude-code CLI
+            if command -v claude &> /dev/null; then
+              echo "✅ claude-code is available: $(claude --version)"
+            else
+              echo "⚠️  claude-code not found in PATH"
             fi
             echo ""
             
