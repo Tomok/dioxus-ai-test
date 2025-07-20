@@ -1,4 +1,4 @@
-use crate::components::radar_graph::{RadarCurve, TooltipData};
+use super::{RadarCurve, TooltipData};
 use crate::components::utils::polar_to_cartesian;
 use dioxus::prelude::*;
 use std::f32::consts::PI;

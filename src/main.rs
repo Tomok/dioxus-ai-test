@@ -2,7 +2,9 @@
 // need dioxus
 use dioxus::prelude::*;
 
-use components::{DataPoint, RadarCurve, RadarGraph};
+use components::radar::{DataPoint, RadarCurve};
+use components::radar::container::RadarContainer;
+use components::utils::ThemeButtons;
 
 /// Define a components module that contains all shared components for our app.
 mod components;
@@ -90,7 +92,8 @@ fn App() -> Element {
     };
 
     // The `rsx!` macro lets us define HTML inside of rust. It expands to an Element with all of our HTML inside.
-    // Initialize dark mode on load
+    // Initialize dark mode on load - only for web platform
+    #[cfg(feature = "web")]
     use_effect(|| {
         let script = r#"
         // Check for color theme preference and apply it
@@ -142,57 +145,14 @@ fn App() -> Element {
                     class: "text-3xl font-bold",
                     "Radar Graph Demo"
                 }
-                div {
-                    class: "flex gap-2 items-center",
-                    button {
-                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
-                        onclick: move |_| {
-                            let script = r#"
-                                localStorage.theme = 'light'; 
-                                document.documentElement.classList.remove('dark');
-                                console.log('Light mode activated');
-                            "#;
-                            let _ = js_sys::eval(script);
-                        },
-                        title: "Light mode",
-                        "☀️"
-                    }
-                    button {
-                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
-                        onclick: move |_| {
-                            let script = r#"
-                                localStorage.removeItem('theme'); 
-                                if (window.matchMedia('(prefers-color-scheme: dark)').matches) { 
-                                    document.documentElement.classList.add('dark');
-                                    console.log('System theme (dark) activated'); 
-                                } else { 
-                                    document.documentElement.classList.remove('dark');
-                                    console.log('System theme (light) activated');
-                                }
-                            "#;
-                            let _ = js_sys::eval(script);
-                        },
-                        title: "System preference",
-                        "🌓"
-                    }
-                    button {
-                        class: "p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
-                        onclick: move |_| {
-                            let script = r#"
-                                localStorage.theme = 'dark'; 
-                                document.documentElement.classList.add('dark');
-                                console.log('Dark mode activated');
-                            "#;
-                            let _ = js_sys::eval(script);
-                        },
-                        title: "Dark mode",
-                        "🌙"
-                    }
-                }
+                
+                // Theme buttons component will be empty on non-web platforms
+                ThemeButtons {}
             }
+            // Responsive radar graph container
             div {
-                class: "flex justify-center",
-                RadarGraph {
+                class: "container mx-auto",
+                RadarContainer {
                     axes: axes,
                     curves: vec![curve1, curve2],
                     max_value: 100.0,

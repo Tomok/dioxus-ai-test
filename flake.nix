@@ -76,6 +76,8 @@
           xorg.libXrandr
           xorg.libXi
           vulkan-loader
+          # for dx build for linux app (--plattform desktop):
+          xdotool
         ];
 
 
@@ -126,7 +128,7 @@
             echo "  dx --help     - Show all available commands"
             echo ""
             echo "Tailwind CSS commands:"
-            echo "  npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch  - Watch and compile Tailwind CSS"
+            echo "  tailwindcss -i ./tailwind.css -o ./assets/tailwind.css --watch  - Watch and compile Tailwind CSS"
             echo "  npm run tailwind  - Same as above, using npm script"
             echo ""
             
