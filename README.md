@@ -45,6 +45,10 @@ dx serve --platform desktop
 ```
 **WARNING**: Depending on the browser library on the desktop, the resulting application might not render svgs and hence not show any graph.
 
+## Git Hooks
+
+This project includes Git hooks to enforce code quality standards. See the [hooks directory](./hooks/README.md) for setup instructions and available hooks.
+
 ## Deployment
 
 This project is automatically deployed to GitHub Pages using GitHub Actions. Every push to the main branch triggers a build and deployment process:

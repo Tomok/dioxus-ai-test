@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Pre-commit hook that enforces code quality standards
+# Runs cargo fmt and cargo clippy as required by CLAUDE.md
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# Check if we're in a nix environment, if not use nix develop --command
+if ! command -v cargo >/dev/null 2>&1; then
+    echo "Cargo not found, using nix develop environment..."
+    CARGO_CMD="nix develop --command cargo"
+else
+    CARGO_CMD="cargo"
+fi
+
+# Format all Rust code
+echo "Formatting Rust code..."
+$CARGO_CMD fmt --check
+if [ $? -ne 0 ]; then
+    echo "❌ Code formatting check failed. Please run 'cargo fmt' or 'nix develop --command cargo fmt' to fix formatting."
+    exit 1
+fi
+
+# Run clippy checks
+echo "Running clippy checks..."
+$CARGO_CMD clippy -- -D warnings
+if [ $? -ne 0 ]; then
+    echo "❌ Clippy checks failed. Please fix all clippy warnings before committing."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
