@@ -43,6 +43,7 @@ To run for a different platform, use the `--platform platform` flag. E.g.
 ```bash
 dx serve --platform desktop
 ```
+**WARNING**: Depending on the browser library on the desktop, the resulting application might not render svgs and hence not show any graph.
 
 ## Deployment
 
