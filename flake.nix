@@ -73,6 +73,8 @@
           xorg.libXrandr
           xorg.libXi
           vulkan-loader
+          # for dx build for linux app (--plattform desktop):
+          xdotool
         ];
 
         # wasm-bindgen-cli with the specific version needed (0.2.97 to match binary)
