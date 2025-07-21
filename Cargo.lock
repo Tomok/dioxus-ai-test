@@ -3290,6 +3290,7 @@ dependencies = [
  "dioxus",
  "js-sys",
  "log",
+ "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
 ]

@@ -1,5 +1,6 @@
 use dioxus::hooks::use_signal;
 use dioxus::prelude::*;
+use thiserror::Error;
 
 /// Submodules containing components directly used by the container
 pub mod graph;
@@ -8,13 +9,30 @@ pub mod legend;
 use graph::radar::{RadarCurve, RadarGraph};
 use legend::RadarLegend;
 
+/// Error types for RadarContainer
+#[derive(Error, Debug, Clone)]
+pub enum RadarError {
+    #[error("Data point count mismatch in curve '{curve_name}': expected {expected} points (to match axis count), got {actual} points")]
+    DataPointCountMismatch { 
+        curve_name: String,
+        expected: usize, 
+        actual: usize 
+    },
+
+    #[error("No axes provided for radar graph")]
+    NoAxesProvided,
+
+    #[error("No curves provided for radar graph")]
+    NoCurvesProvided,
+}
+
 /// Props for the RadarContainer component
 #[derive(Props, PartialEq, Clone)]
 pub struct RadarContainerProps {
     /// List of axis names for the radar graph
-    pub axes: Vec<String>,
+    axes: Vec<String>,
     /// List of curves to be displayed
-    pub curves: Vec<RadarCurve>,
+    curves: Vec<RadarCurve>,
     /// Maximum value for all axes (scale)
     #[props(default = 100.0)]
     pub max_value: f32,
@@ -24,6 +42,86 @@ pub struct RadarContainerProps {
     /// Height of the SVG element
     #[props(default = 500)]
     pub height: u32,
+}
+
+impl RadarContainerProps {
+    /// Create a new RadarContainerProps with validation
+    pub fn new(
+        axes: Vec<String>,
+        curves: Vec<RadarCurve>,
+        max_value: Option<f32>,
+        width: Option<u32>,
+        height: Option<u32>,
+    ) -> Result<Self, RadarError> {
+        // Validate axes and curves
+        if axes.is_empty() {
+            return Err(RadarError::NoAxesProvided);
+        }
+
+        if curves.is_empty() {
+            return Err(RadarError::NoCurvesProvided);
+        }
+
+        // Validate that each curve has the correct number of data points
+        for curve in &curves {
+            let data_point_count = curve.data_points.len();
+            if data_point_count != axes.len() {
+                return Err(RadarError::DataPointCountMismatch {
+                    curve_name: curve.name.clone(),
+                    expected: axes.len(),
+                    actual: data_point_count,
+                });
+            }
+        }
+
+        // If validation passes, create the props
+        Ok(Self {
+            axes,
+            curves,
+            max_value: max_value.unwrap_or(100.0),
+            width: width.unwrap_or(600),
+            height: height.unwrap_or(500),
+        })
+    }
+
+    /// Set both axes and curves with validation
+    pub fn set_data(&mut self, axes: Vec<String>, curves: Vec<RadarCurve>) -> Result<(), RadarError> {
+        // Validate axes and curves
+        if axes.is_empty() {
+            return Err(RadarError::NoAxesProvided);
+        }
+
+        if curves.is_empty() {
+            return Err(RadarError::NoCurvesProvided);
+        }
+
+        // Validate that each curve has the correct number of data points
+        for curve in &curves {
+            let data_point_count = curve.data_points.len();
+            if data_point_count != axes.len() {
+                return Err(RadarError::DataPointCountMismatch {
+                    curve_name: curve.name.clone(),
+                    expected: axes.len(),
+                    actual: data_point_count,
+                });
+            }
+        }
+
+        // If validation passes, update the props
+        self.axes = axes;
+        self.curves = curves;
+        Ok(())
+    }
+
+    /// Get a reference to the axes
+    pub fn axes(&self) -> &Vec<String> {
+        &self.axes
+    }
+
+    /// Get a reference to the curves
+    pub fn curves(&self) -> &Vec<RadarCurve> {
+        &self.curves
+    }
 }
 
 /// A responsive container for the radar graph and legend
@@ -41,7 +139,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
         // Start with all curves visible (true)
         props_signal
             .read()
-            .curves
+            .curves()
             .iter()
             .map(|curve| (curve.name.clone(), true))
             .collect::<Vec<_>>()
@@ -50,7 +148,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
     // Update visibility map if curves have changed
     {
         let current_curve_names: Vec<String> =
-            props_signal.read().curves.iter().map(|c| c.name.clone()).collect();
+            props_signal.read().curves().iter().map(|c| c.name.clone()).collect();
         let existing_names: Vec<String> = visible_map
             .read()
             .iter()
@@ -61,7 +159,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
         if current_curve_names != existing_names {
             let mut new_visibility = Vec::new();
 
-            for curve in &props_signal.read().curves {
+            for curve in props_signal.read().curves() {
                 // Try to find existing visibility setting
                 let is_visible = visible_map
                     .read()
@@ -97,7 +195,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
     let visible_curves = {
         let props_read = props_signal.read();
         props_read
-            .curves
+            .curves()
             .iter()
             .filter_map(|curve| {
                 let is_visible = visible_map
@@ -125,7 +223,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
             div {
                 class: "flex-shrink-0",
                 RadarGraph {
-                    axes: props_signal.read().axes.clone(),
+                    axes: props_signal.read().axes().clone(),
                     curves: visible_curves,
                     max_value: props_signal.read().max_value,
                     width: props_signal.read().width,
@@ -145,7 +243,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
                     div {
                         class: "space-y-2",
                         RadarLegend {
-                            curves: props_signal.read().curves.clone(),
+                            curves: props_signal.read().curves().clone(),
                             visible_map: visible_map,
                             on_click: on_legend_click,
                             // Always use vertical layout for the legend
