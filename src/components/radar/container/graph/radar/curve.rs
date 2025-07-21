@@ -120,6 +120,7 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
     rsx! {
         g {
             class: "radar-curve",
+            "pointer-events": "auto",
             // First render the curve path (lowest layer)
             path {
                 d: "{path_data}",

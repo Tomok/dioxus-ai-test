@@ -12,6 +12,9 @@ pub struct TooltipProps {
     /// Whether the tooltip is visible
     #[props(default = false)]
     pub visible: bool,
+    /// Whether the tooltip is pinned (stays visible when not hovering)
+    #[props(default = false)]
+    pub pinned: bool,
 }
 
 /// A simple tooltip component for displaying information on hover
@@ -24,10 +27,13 @@ pub fn Tooltip(props: TooltipProps) -> Element {
     // Position the tooltip slightly above the point
     let tooltip_x = props.x;
     let tooltip_y = props.y - 15.0;
+    
+    // Add class for pinned state
+    let pinned_class = if props.pinned { "tooltip-pinned" } else { "" };
 
     rsx! {
         g {
-            class: "tooltip",
+            class: "tooltip {pinned_class}",
             // Add pointer-events: none to ensure the tooltip doesn't interfere with mouse events
             style: "pointer-events: none;",
             rect {

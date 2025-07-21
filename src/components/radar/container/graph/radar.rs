@@ -25,6 +25,8 @@ pub struct TooltipData {
     pub y: f32,
     /// Color of the curve
     pub color: String,
+    /// Whether the tooltip is pinned (remains visible when not hovering)
+    pub pinned: bool,
 }
 
 /// A data point for the radar graph.
@@ -113,7 +115,8 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                     x: data.x,
                     y: data.y,
                     content: data.label.clone(),
-                    visible: true
+                    visible: true,
+                    pinned: data.pinned
                 }
             }
         } else {
@@ -128,6 +131,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                 width: "{props.width}",
                 height: "{props.height}",
                 view_box: "0 0 {props.width} {props.height}",
+                "pointer-events": "auto",
 
                 // Grid circles
                 RadarGrid {
