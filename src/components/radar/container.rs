@@ -13,10 +13,10 @@ use legend::RadarLegend;
 #[derive(Error, Debug, Clone)]
 pub enum RadarError {
     #[error("Data point count mismatch in curve '{curve_name}': expected {expected} points (to match axis count), got {actual} points")]
-    DataPointCountMismatch { 
+    DataPointCountMismatch {
         curve_name: String,
-        expected: usize, 
-        actual: usize 
+        expected: usize,
+        actual: usize,
     },
 
     #[error("No axes provided for radar graph")]
@@ -85,7 +85,11 @@ impl RadarContainerProps {
     }
 
     /// Set both axes and curves with validation
-    pub fn set_data(&mut self, axes: Vec<String>, curves: Vec<RadarCurve>) -> Result<(), RadarError> {
+    pub fn set_data(
+        &mut self,
+        axes: Vec<String>,
+        curves: Vec<RadarCurve>,
+    ) -> Result<(), RadarError> {
         // Validate axes and curves
         if axes.is_empty() {
             return Err(RadarError::NoAxesProvided);
@@ -133,7 +137,7 @@ impl RadarContainerProps {
 pub fn RadarContainer(props: RadarContainerProps) -> Element {
     // Create signal from props so changes to them will trigger re-renders
     let props_signal = use_signal(|| props);
-    
+
     // Initialize visibility state for all curves
     let mut visible_map = use_signal(|| {
         // Start with all curves visible (true)
@@ -147,8 +151,12 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
 
     // Update visibility map if curves have changed
     {
-        let current_curve_names: Vec<String> =
-            props_signal.read().curves().iter().map(|c| c.name.clone()).collect();
+        let current_curve_names: Vec<String> = props_signal
+            .read()
+            .curves()
+            .iter()
+            .map(|c| c.name.clone())
+            .collect();
         let existing_names: Vec<String> = visible_map
             .read()
             .iter()

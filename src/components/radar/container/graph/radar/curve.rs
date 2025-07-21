@@ -3,6 +3,10 @@ use crate::components::utils::polar_to_cartesian;
 use dioxus::prelude::*;
 use std::f32::consts::PI;
 
+// Import the DataPoint component
+pub mod data_point;
+use self::data_point::DataPoint;
+
 #[derive(Props, PartialEq, Clone)]
 pub struct RadarCurveVisualProps {
     /// Data for the curve
@@ -99,62 +103,16 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
     let point_circles = (0..axes_count).map(|i| {
         let (x, y) = points[i];
         let data_point = &props.curve.data_points[i];
-        let curve_idx = props.curve_index;
-        let curve_color = props.curve.color.clone();
-
-        // Create tooltip content here, but don't move it into closures
         let tooltip_content = format!("{}: {}", data_point.label, data_point.value);
 
-        // Create closures that clone the tooltip content when needed
-        let tooltip_content_clone1 = tooltip_content.clone();
-        let tooltip_content_clone2 = tooltip_content;
-        let curve_color_clone1 = curve_color.clone();
-        let curve_color_clone2 = curve_color;
-
-        let mut tooltip_state_clone1 = props.tooltip_state;
-        let mut tooltip_state_clone2 = props.tooltip_state;
-
         rsx! {
-            g {
-                class: "data-point",
-                circle {
-                    cx: "{x}",
-                    cy: "{y}",
-                    r: "4",
-                    fill: "{props.curve.color}",
-                    // Create a slightly larger transparent circle for better hover target
-                    onmouseenter: move |_| {
-                        tooltip_state_clone1.set(Some(TooltipData {
-                            curve_index: curve_idx,
-                            label: tooltip_content_clone1.clone(),
-                            x,
-                            y,
-                            color: curve_color_clone1.clone(),
-                        }));
-                    },
-                    onmouseleave: move |_| {
-                        tooltip_state_clone1.set(None);
-                    }
-                },
-                // Add invisible larger circle to make hovering easier
-                circle {
-                    cx: "{x}",
-                    cy: "{y}",
-                    r: "10",
-                    fill: "transparent",
-                    onmouseenter: move |_| {
-                        tooltip_state_clone2.set(Some(TooltipData {
-                            curve_index: curve_idx,
-                            label: tooltip_content_clone2.clone(),
-                            x,
-                            y,
-                            color: curve_color_clone2.clone(),
-                        }));
-                    },
-                    onmouseleave: move |_| {
-                        tooltip_state_clone2.set(None);
-                    }
-                }
+            DataPoint {
+                x: x,
+                y: y,
+                curve_index: props.curve_index,
+                color: props.curve.color.clone(),
+                tooltip_content: tooltip_content,
+                tooltip_state: props.tooltip_state
             }
         }
     });
