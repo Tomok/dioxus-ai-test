@@ -33,10 +33,14 @@ pub struct RadarContainerProps {
 /// It also manages the visibility state shared between the graph and legend.
 #[component]
 pub fn RadarContainer(props: RadarContainerProps) -> Element {
+    // Create signal from props so changes to them will trigger re-renders
+    let props_signal = use_signal(|| props);
+    
     // Initialize visibility state for all curves
     let mut visible_map = use_signal(|| {
         // Start with all curves visible (true)
-        props
+        props_signal
+            .read()
             .curves
             .iter()
             .map(|curve| (curve.name.clone(), true))
@@ -46,7 +50,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
     // Update visibility map if curves have changed
     {
         let current_curve_names: Vec<String> =
-            props.curves.iter().map(|c| c.name.clone()).collect();
+            props_signal.read().curves.iter().map(|c| c.name.clone()).collect();
         let existing_names: Vec<String> = visible_map
             .read()
             .iter()
@@ -57,7 +61,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
         if current_curve_names != existing_names {
             let mut new_visibility = Vec::new();
 
-            for curve in &props.curves {
+            for curve in &props_signal.read().curves {
                 // Try to find existing visibility setting
                 let is_visible = visible_map
                     .read()
@@ -90,24 +94,27 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
     };
 
     // Filter curves based on visibility for the graph
-    let visible_curves = props
-        .curves
-        .iter()
-        .filter_map(|curve| {
-            let is_visible = visible_map
-                .read()
-                .iter()
-                .find(|(name, _)| name == &curve.name)
-                .map(|(_, vis)| *vis)
-                .unwrap_or(true);
+    let visible_curves = {
+        let props_read = props_signal.read();
+        props_read
+            .curves
+            .iter()
+            .filter_map(|curve| {
+                let is_visible = visible_map
+                    .read()
+                    .iter()
+                    .find(|(name, _)| name == &curve.name)
+                    .map(|(_, vis)| *vis)
+                    .unwrap_or(true);
 
-            if is_visible {
-                Some(curve.clone())
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>();
+                if is_visible {
+                    Some(curve.clone())
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+    };
 
     rsx! {
         div {
@@ -118,11 +125,11 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
             div {
                 class: "flex-shrink-0",
                 RadarGraph {
-                    axes: props.axes.clone(),
+                    axes: props_signal.read().axes.clone(),
                     curves: visible_curves,
-                    max_value: props.max_value,
-                    width: props.width,
-                    height: props.height,
+                    max_value: props_signal.read().max_value,
+                    width: props_signal.read().width,
+                    height: props_signal.read().height,
                 }
             }
 
@@ -138,7 +145,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
                     div {
                         class: "space-y-2",
                         RadarLegend {
-                            curves: props.curves.clone(),
+                            curves: props_signal.read().curves.clone(),
                             visible_map: visible_map,
                             on_click: on_legend_click,
                             // Always use vertical layout for the legend
