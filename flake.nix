@@ -79,13 +79,45 @@
           xdotool
         ];
 
+        
+        # Dioxus CLI via cargo install, without tests
+        dioxus-cli = pkgs.rustPlatform.buildRustPackage {
+          pname = "dioxus-cli";
+          version = "0.6.0";
+          
+          src = pkgs.fetchCrate {
+            pname = "dioxus-cli";
+            version = "0.6.0";
+            sha256 = "sha256-0Kg2/+S8EuMYZQaK4Ao+mbS7K48VhVWjPL+LnoVJMSw=";
+          };
+          
+          cargoHash = "sha256-uD3AHHY3edpqyQ8gnsTtxQsen8UzyVIbArSvpMa+B+8=";
+          
+          # Skip tests completely
+          doCheck = false;
+          
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            rustToolchain
+          ];
+
+          buildInputs = systemDeps;
+
+          # Environment variables for the build
+          OPENSSL_NO_VENDOR = "1";
+          OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+          OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
+          
+          # Add CA certificates path
+          SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+          NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        };
 
 
       in
       {
         packages = {
-          dioxus-cli = pkgs.dioxus-cli;
-          wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
+          dioxus-cli = dioxus-cli;
         };
 
         devShells.default = pkgs.mkShell {
