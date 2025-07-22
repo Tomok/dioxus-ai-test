@@ -120,8 +120,6 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
     rsx! {
         g {
             class: "radar-curve",
-            // Set to none to allow events to pass through to children
-            "pointer-events": "none",
             // First render the curve path (lowest layer)
             path {
                 d: "{path_data}",
@@ -130,8 +128,6 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
                 stroke: "{props.curve.color}",
                 "stroke-width": "2",
                 "stroke-linejoin": "round",
-                // Ensure the path is below points by setting pointer-events to none
-                "pointer-events": "none"
             }
             // Add circles for each data point
             {point_circles}

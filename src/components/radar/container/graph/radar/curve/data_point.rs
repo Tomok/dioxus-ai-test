@@ -104,15 +104,12 @@ pub fn DataPoint(props: DataPointProps) -> Element {
     rsx! {
         g {
             class: "data-point",
-            // Parent group should not interfere with events
-            "pointer-events": "none",
             circle {
                 cx: "{x}",
                 cy: "{y}",
                 r: "4",
                 fill: "{color}",
-                // This visible circle should receive all pointer events
-                "pointer-events": "visiblePainted",
+                class: "data-point-circle",
                 onmouseenter: move |_| {
                     // Only set tooltip if there isn't already a pinned one
                     if tooltip_state_clone1.read().as_ref().is_none_or(|t| !t.pinned) {
@@ -141,8 +138,7 @@ pub fn DataPoint(props: DataPointProps) -> Element {
                 cy: "{y}",
                 r: "10",
                 fill: "transparent",
-                // The transparent circle should still receive events
-                "pointer-events": "fill",
+                class: "data-point-hitarea",
                 onmouseenter: move |_| {
                     // Only set tooltip if there isn't already a pinned one
                     if tooltip_state_clone2.read().as_ref().is_none_or(|t| !t.pinned) {

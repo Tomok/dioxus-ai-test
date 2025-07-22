@@ -4,6 +4,7 @@
 
 /* Custom styles */
 @layer components {
+  /* Tooltip styles */
   .tooltip-pinned rect {
     stroke: #ffffff;
     stroke-width: 2px;
@@ -11,5 +12,32 @@
 
   .dark .tooltip-pinned rect {
     stroke: #dddddd;
+  }
+  
+  /* SVG pointer-events styles */
+  .tooltip {
+    pointer-events: none;
+  }
+  
+  .radar-curve {
+    /* Allow all radar curves to participate in the stacking context */
+    pointer-events: visible;
+  }
+  
+  .radar-curve path {
+    pointer-events: none;
+  }
+  
+  .data-point {
+    /* Need this to be visible to ensure proper stacking context */
+    pointer-events: visible;
+  }
+  
+  .data-point-circle {
+    pointer-events: visiblePainted;
+  }
+  
+  .data-point-hitarea {
+    pointer-events: fill;
   }
 }

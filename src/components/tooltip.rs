@@ -34,8 +34,6 @@ pub fn Tooltip(props: TooltipProps) -> Element {
     rsx! {
         g {
             class: "tooltip {pinned_class}",
-            // Add pointer-events: none to ensure the tooltip doesn't interfere with mouse events
-            style: "pointer-events: none;",
             rect {
                 x: "{tooltip_x - 60.0}",
                 y: "{tooltip_y - 25.0}",
