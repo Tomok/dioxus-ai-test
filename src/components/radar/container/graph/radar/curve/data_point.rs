@@ -21,157 +21,105 @@ pub struct DataPointProps {
 #[component]
 pub fn DataPoint(props: DataPointProps) -> Element {
     let curve_idx = props.curve_index;
-    let color = props.color.clone();
     let x = props.x;
     let y = props.y;
 
-    // Create closures that clone the tooltip content when needed
-    let tooltip_content_clone1 = props.tooltip_content.clone();
-    let tooltip_content_clone2 = props.tooltip_content.clone();
-    let tooltip_content_clone3 = props.tooltip_content.clone();
-    let tooltip_content_clone4 = props.tooltip_content.clone();
+    // Create separate clones for each closure to avoid move errors
+    let tooltip_content_click = props.tooltip_content.clone();
+    let mut tooltip_state_click = props.tooltip_state;
+    let color_click = props.color.clone();
 
-    let color_clone1 = color.clone();
-    let color_clone2 = color.clone();
-    let color_clone3 = color.clone();
-    let color_clone4 = color.clone();
+    let tooltip_content_enter = props.tooltip_content.clone();
+    let mut tooltip_state_enter = props.tooltip_state;
+    let color_enter = props.color.clone();
 
-    let mut tooltip_state_clone1 = props.tooltip_state;
-    let mut tooltip_state_clone2 = props.tooltip_state;
-    let mut tooltip_state_clone3 = props.tooltip_state;
-    let mut tooltip_state_clone4 = props.tooltip_state;
+    let mut tooltip_state_leave = props.tooltip_state;
 
-    // Click handler for the visible point
-    let on_visible_point_click = move |_| {
-        // Get current tooltip state
-        let current_tooltip = tooltip_state_clone3.read().clone();
-        
+    // Clone color once more for the render function
+    let color_render = props.color.clone();
+
+    // Click handler that always pins on first click, unpins on second
+    let handle_click = move |_| {
+        let current_tooltip = tooltip_state_click.read().clone();
+
         // Check if this is the same data point and it's already pinned
         let is_same_point_and_pinned = current_tooltip
             .as_ref()
-            .is_some_and(|t| t.curve_index == curve_idx && 
-                           t.x == x && 
-                           t.y == y && 
-                           t.pinned);
-            
+            .is_some_and(|t| t.curve_index == curve_idx && t.x == x && t.y == y && t.pinned);
+
         if is_same_point_and_pinned {
-            // This is the same point and it's already pinned, so unpin it
-            tooltip_state_clone3.set(Some(TooltipData {
+            // If it's already pinned, unpin it
+            tooltip_state_click.set(Some(TooltipData {
                 curve_index: curve_idx,
-                label: tooltip_content_clone3.clone(),
+                label: tooltip_content_click.clone(),
                 x,
                 y,
-                color: color_clone3.clone(),
+                color: color_click.clone(),
                 pinned: false,
             }));
         } else {
-            // Either different point or not pinned, so always pin this one
-            tooltip_state_clone3.set(Some(TooltipData {
+            // Otherwise, pin it (overriding any other pinned tooltip)
+            tooltip_state_click.set(Some(TooltipData {
                 curve_index: curve_idx,
-                label: tooltip_content_clone3.clone(),
+                label: tooltip_content_click.clone(),
                 x,
                 y,
-                color: color_clone3.clone(),
+                color: color_click.clone(),
                 pinned: true,
             }));
         }
     };
 
-    // Click handler for the invisible point
-    let on_invisible_point_click = move |_| {
-        // Get current tooltip state
-        let current_tooltip = tooltip_state_clone4.read().clone();
-        
-        // Check if this is the same data point and it's already pinned
-        let is_same_point_and_pinned = current_tooltip
+    let handle_mouseenter = move |_| {
+        // Only set tooltip if there isn't already a pinned one
+        if tooltip_state_enter
+            .read()
             .as_ref()
-            .is_some_and(|t| t.curve_index == curve_idx && 
-                           t.x == x && 
-                           t.y == y && 
-                           t.pinned);
-            
-        if is_same_point_and_pinned {
-            // This is the same point and it's already pinned, so unpin it
-            tooltip_state_clone4.set(Some(TooltipData {
+            .is_none_or(|t| !t.pinned)
+        {
+            tooltip_state_enter.set(Some(TooltipData {
                 curve_index: curve_idx,
-                label: tooltip_content_clone4.clone(),
+                label: tooltip_content_enter.clone(),
                 x,
                 y,
-                color: color_clone4.clone(),
+                color: color_enter.clone(),
                 pinned: false,
             }));
-        } else {
-            // Either different point or not pinned, so always pin this one
-            tooltip_state_clone4.set(Some(TooltipData {
-                curve_index: curve_idx,
-                label: tooltip_content_clone4.clone(),
-                x,
-                y,
-                color: color_clone4.clone(),
-                pinned: true,
-            }));
+        }
+    };
+
+    let handle_mouseleave = move |_| {
+        // Only hide tooltip if it's not pinned
+        let is_pinned = tooltip_state_leave
+            .read()
+            .as_ref()
+            .is_some_and(|t| t.pinned);
+        if !is_pinned {
+            tooltip_state_leave.set(None);
         }
     };
 
     rsx! {
         g {
             class: "data-point",
+            // Visible circle - just for display
             circle {
                 cx: "{x}",
                 cy: "{y}",
                 r: "4",
-                fill: "{color}",
+                fill: "{color_render}",
                 class: "data-point-circle",
-                onmouseenter: move |_| {
-                    // Only set tooltip if there isn't already a pinned one
-                    if tooltip_state_clone1.read().as_ref().is_none_or(|t| !t.pinned) {
-                        tooltip_state_clone1.set(Some(TooltipData {
-                            curve_index: curve_idx,
-                            label: tooltip_content_clone1.clone(),
-                            x,
-                            y,
-                            color: color_clone1.clone(),
-                            pinned: false,
-                        }));
-                    }
-                },
-                onmouseleave: move |_| {
-                    // Only hide tooltip if it's not pinned
-                    let is_pinned = tooltip_state_clone1.read().as_ref().is_some_and(|t| t.pinned);
-                    if !is_pinned {
-                        tooltip_state_clone1.set(None);
-                    }
-                },
-                onclick: on_visible_point_click
             },
-            // Add invisible larger circle to make hovering easier
+            // Invisible larger circle for all interactions
             circle {
                 cx: "{x}",
                 cy: "{y}",
                 r: "10",
                 fill: "transparent",
                 class: "data-point-hitarea",
-                onmouseenter: move |_| {
-                    // Only set tooltip if there isn't already a pinned one
-                    if tooltip_state_clone2.read().as_ref().is_none_or(|t| !t.pinned) {
-                        tooltip_state_clone2.set(Some(TooltipData {
-                            curve_index: curve_idx,
-                            label: tooltip_content_clone2.clone(),
-                            x,
-                            y,
-                            color: color_clone2.clone(),
-                            pinned: false,
-                        }));
-                    }
-                },
-                onmouseleave: move |_| {
-                    // Only hide tooltip if it's not pinned
-                    let is_pinned = tooltip_state_clone2.read().as_ref().is_some_and(|t| t.pinned);
-                    if !is_pinned {
-                        tooltip_state_clone2.set(None);
-                    }
-                },
-                onclick: on_invisible_point_click
+                onmouseenter: handle_mouseenter,
+                onmouseleave: handle_mouseleave,
+                onclick: handle_click,
             }
         }
     }

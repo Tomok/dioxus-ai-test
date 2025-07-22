@@ -34,10 +34,12 @@
   }
   
   .data-point-circle {
-    pointer-events: visiblePainted;
+    /* No pointer events on the visible circle, all handled by hitarea */
+    pointer-events: none;
   }
   
   .data-point-hitarea {
-    pointer-events: fill;
+    /* Make sure hitarea captures all events */
+    pointer-events: all;
   }
 }

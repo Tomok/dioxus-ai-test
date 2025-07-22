@@ -27,7 +27,7 @@ pub fn Tooltip(props: TooltipProps) -> Element {
     // Position the tooltip slightly above the point
     let tooltip_x = props.x;
     let tooltip_y = props.y - 15.0;
-    
+
     // Add class for pinned state
     let pinned_class = if props.pinned { "tooltip-pinned" } else { "" };
 
