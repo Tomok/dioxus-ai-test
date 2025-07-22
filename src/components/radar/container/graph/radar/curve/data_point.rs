@@ -43,61 +43,73 @@ pub fn DataPoint(props: DataPointProps) -> Element {
 
     // Click handler for the visible point
     let on_visible_point_click = move |_| {
-        // Toggle pinned state on click
+        // Get current tooltip state
         let current_tooltip = tooltip_state_clone3.read().clone();
-        match current_tooltip {
-            Some(tooltip) => {
-                // Create a new tooltip with toggled pinned state
-                tooltip_state_clone3.set(Some(TooltipData {
-                    curve_index: curve_idx,
-                    label: tooltip_content_clone3.clone(),
-                    x,
-                    y,
-                    color: color_clone3.clone(),
-                    pinned: !tooltip.pinned,
-                }));
-            }
-            None => {
-                // Create a new pinned tooltip if none exists
-                tooltip_state_clone3.set(Some(TooltipData {
-                    curve_index: curve_idx,
-                    label: tooltip_content_clone3.clone(),
-                    x,
-                    y,
-                    color: color_clone3.clone(),
-                    pinned: true,
-                }));
-            }
+        
+        // Check if this is the same data point and it's already pinned
+        let is_same_point_and_pinned = current_tooltip
+            .as_ref()
+            .is_some_and(|t| t.curve_index == curve_idx && 
+                           t.x == x && 
+                           t.y == y && 
+                           t.pinned);
+            
+        if is_same_point_and_pinned {
+            // This is the same point and it's already pinned, so unpin it
+            tooltip_state_clone3.set(Some(TooltipData {
+                curve_index: curve_idx,
+                label: tooltip_content_clone3.clone(),
+                x,
+                y,
+                color: color_clone3.clone(),
+                pinned: false,
+            }));
+        } else {
+            // Either different point or not pinned, so always pin this one
+            tooltip_state_clone3.set(Some(TooltipData {
+                curve_index: curve_idx,
+                label: tooltip_content_clone3.clone(),
+                x,
+                y,
+                color: color_clone3.clone(),
+                pinned: true,
+            }));
         }
     };
 
     // Click handler for the invisible point
     let on_invisible_point_click = move |_| {
-        // Toggle pinned state on click
+        // Get current tooltip state
         let current_tooltip = tooltip_state_clone4.read().clone();
-        match current_tooltip {
-            Some(tooltip) => {
-                // Create a new tooltip with toggled pinned state
-                tooltip_state_clone4.set(Some(TooltipData {
-                    curve_index: curve_idx,
-                    label: tooltip_content_clone4.clone(),
-                    x,
-                    y,
-                    color: color_clone4.clone(),
-                    pinned: !tooltip.pinned,
-                }));
-            }
-            None => {
-                // Create a new pinned tooltip if none exists
-                tooltip_state_clone4.set(Some(TooltipData {
-                    curve_index: curve_idx,
-                    label: tooltip_content_clone4.clone(),
-                    x,
-                    y,
-                    color: color_clone4.clone(),
-                    pinned: true,
-                }));
-            }
+        
+        // Check if this is the same data point and it's already pinned
+        let is_same_point_and_pinned = current_tooltip
+            .as_ref()
+            .is_some_and(|t| t.curve_index == curve_idx && 
+                           t.x == x && 
+                           t.y == y && 
+                           t.pinned);
+            
+        if is_same_point_and_pinned {
+            // This is the same point and it's already pinned, so unpin it
+            tooltip_state_clone4.set(Some(TooltipData {
+                curve_index: curve_idx,
+                label: tooltip_content_clone4.clone(),
+                x,
+                y,
+                color: color_clone4.clone(),
+                pinned: false,
+            }));
+        } else {
+            // Either different point or not pinned, so always pin this one
+            tooltip_state_clone4.set(Some(TooltipData {
+                curve_index: curve_idx,
+                label: tooltip_content_clone4.clone(),
+                x,
+                y,
+                color: color_clone4.clone(),
+                pinned: true,
+            }));
         }
     };
 
