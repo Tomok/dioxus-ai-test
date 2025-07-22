@@ -131,7 +131,6 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
                 width: "{props.width}",
                 height: "{props.height}",
                 view_box: "0 0 {props.width} {props.height}",
-                "pointer-events": "auto",
 
                 // Grid circles
                 RadarGrid {

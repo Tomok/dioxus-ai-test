@@ -30,7 +30,7 @@ pub fn DataPoint(props: DataPointProps) -> Element {
     let tooltip_content_clone2 = props.tooltip_content.clone();
     let tooltip_content_clone3 = props.tooltip_content.clone();
     let tooltip_content_clone4 = props.tooltip_content.clone();
-    
+
     let color_clone1 = color.clone();
     let color_clone2 = color.clone();
     let color_clone3 = color.clone();
@@ -56,7 +56,7 @@ pub fn DataPoint(props: DataPointProps) -> Element {
                     color: color_clone3.clone(),
                     pinned: !tooltip.pinned,
                 }));
-            },
+            }
             None => {
                 // Create a new pinned tooltip if none exists
                 tooltip_state_clone3.set(Some(TooltipData {
@@ -86,7 +86,7 @@ pub fn DataPoint(props: DataPointProps) -> Element {
                     color: color_clone4.clone(),
                     pinned: !tooltip.pinned,
                 }));
-            },
+            }
             None => {
                 // Create a new pinned tooltip if none exists
                 tooltip_state_clone4.set(Some(TooltipData {
@@ -104,14 +104,15 @@ pub fn DataPoint(props: DataPointProps) -> Element {
     rsx! {
         g {
             class: "data-point",
-            "pointer-events": "auto",
+            // Parent group should not interfere with events
+            "pointer-events": "none",
             circle {
                 cx: "{x}",
                 cy: "{y}",
                 r: "4",
                 fill: "{color}",
-                "pointer-events": "all",
-                // Create a slightly larger transparent circle for better hover target
+                // This visible circle should receive all pointer events
+                "pointer-events": "visiblePainted",
                 onmouseenter: move |_| {
                     // Only set tooltip if there isn't already a pinned one
                     if tooltip_state_clone1.read().as_ref().is_none_or(|t| !t.pinned) {
@@ -140,7 +141,8 @@ pub fn DataPoint(props: DataPointProps) -> Element {
                 cy: "{y}",
                 r: "10",
                 fill: "transparent",
-                "pointer-events": "all",
+                // The transparent circle should still receive events
+                "pointer-events": "fill",
                 onmouseenter: move |_| {
                     // Only set tooltip if there isn't already a pinned one
                     if tooltip_state_clone2.read().as_ref().is_none_or(|t| !t.pinned) {
