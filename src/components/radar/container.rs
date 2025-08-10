@@ -11,6 +11,7 @@ use legend::RadarLegend;
 
 /// Error types for RadarContainer
 #[derive(Error, Debug, Clone)]
+#[allow(dead_code)]
 pub enum RadarError {
     #[error("Data point count mismatch in curve '{curve_name}': expected {expected} points (to match axis count), got {actual} points")]
     DataPointCountMismatch {
@@ -44,6 +45,7 @@ pub struct RadarContainerProps {
     pub height: u32,
 }
 
+#[allow(dead_code)]
 impl RadarContainerProps {
     /// Create a new RadarContainerProps with validation
     pub fn new(
@@ -135,8 +137,9 @@ impl RadarContainerProps {
 /// It also manages the visibility state shared between the graph and legend.
 #[component]
 pub fn RadarContainer(props: RadarContainerProps) -> Element {
-    // Create signal from props so changes to them will trigger re-renders
-    let props_signal = use_signal(|| props);
+    // Create mutable signal from props so changes to them will trigger re-renders
+    // and allow for data editing
+    let mut props_signal = use_signal(|| props);
 
     // Initialize visibility state for all curves
     let mut visible_map = use_signal(|| {
@@ -199,6 +202,20 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
         visible_map.set(new_map);
     };
 
+    // Handle value changes from tooltip editing
+    let handle_value_change = move |change: (usize, usize, f32)| {
+        let (curve_index, point_index, new_value) = change;
+        let mut current_props = props_signal.read().clone();
+
+        // Update the data point value
+        if let Some(curve) = current_props.curves.get_mut(curve_index) {
+            if let Some(data_point) = curve.data_points.get_mut(point_index) {
+                data_point.value = new_value;
+                props_signal.set(current_props);
+            }
+        }
+    };
+
     // Filter curves based on visibility for the graph
     let visible_curves = {
         let props_read = props_signal.read();
@@ -236,6 +253,7 @@ pub fn RadarContainer(props: RadarContainerProps) -> Element {
                     max_value: props_signal.read().max_value,
                     width: props_signal.read().width,
                     height: props_signal.read().height,
+                    on_value_change: handle_value_change,
                 }
             }
 

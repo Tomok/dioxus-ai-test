@@ -110,8 +110,10 @@ pub fn RadarCurveVisual(props: RadarCurveVisualProps) -> Element {
                 x: x,
                 y: y,
                 curve_index: props.curve_index,
+                point_index: i,
                 color: props.curve.color.clone(),
                 tooltip_content: tooltip_content,
+                value: data_point.value,
                 tooltip_state: props.tooltip_state
             }
         }

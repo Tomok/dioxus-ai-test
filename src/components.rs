@@ -2,6 +2,7 @@
 //! They can be used to defined common UI elements like buttons, forms, and modals. In this template, we define a
 //! RadarGraph component to be used in our app.
 
+pub mod editable_tooltip;
 pub mod radar;
 pub mod theme_buttons;
 pub mod tooltip;

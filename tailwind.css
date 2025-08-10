@@ -18,6 +18,17 @@
   .tooltip {
     pointer-events: none;
   }
+
+  /* Remove spinner arrows from number inputs in tooltips */
+  .editable-tooltip input[type=number]::-webkit-outer-spin-button,
+  .editable-tooltip input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .editable-tooltip input[type=number] {
+    -moz-appearance: textfield;
+  }
   
   .radar-curve {
     /* Allow all radar curves to participate in the stacking context */

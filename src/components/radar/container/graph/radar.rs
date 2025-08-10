@@ -1,4 +1,4 @@
-use crate::components::tooltip::Tooltip;
+use crate::components::editable_tooltip::EditableTooltip;
 use dioxus::hooks::use_signal;
 use dioxus::prelude::*;
 
@@ -17,8 +17,12 @@ pub mod grid;
 pub struct TooltipData {
     /// Index of the curve
     pub curve_index: usize,
+    /// Index of the data point within the curve
+    pub point_index: usize,
     /// Label to display in the tooltip
     pub label: String,
+    /// Current value of the data point
+    pub value: f32,
     /// X-coordinate of the tooltip
     pub x: f32,
     /// Y-coordinate of the tooltip
@@ -27,6 +31,8 @@ pub struct TooltipData {
     pub color: String,
     /// Whether the tooltip is pinned (remains visible when not hovering)
     pub pinned: bool,
+    /// Whether the tooltip is currently being edited
+    pub editing: bool,
 }
 
 /// A data point for the radar graph.
@@ -46,7 +52,7 @@ pub struct RadarCurve {
 }
 
 /// Props for the RadarGraph component.
-#[derive(Props, PartialEq, Clone)]
+#[derive(Props, Clone)]
 pub struct RadarGraphProps {
     /// List of axis names for the radar graph
     pub axes: Vec<String>,
@@ -61,6 +67,21 @@ pub struct RadarGraphProps {
     /// Height of the SVG element
     #[props(default = 500)]
     pub height: u32,
+    /// Callback for when a data point value is updated
+    #[props(optional)]
+    pub on_value_change: Option<EventHandler<(usize, usize, f32)>>,
+}
+
+// Implement PartialEq manually since EventHandler doesn't implement PartialEq
+impl PartialEq for RadarGraphProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.axes == other.axes
+            && self.curves == other.curves
+            && self.max_value == other.max_value
+            && self.width == other.width
+            && self.height == other.height
+        // Note: We can't compare EventHandler, so we ignore on_value_change in equality
+    }
 }
 
 /// RadarGraph component that displays data in a radar chart
@@ -87,7 +108,7 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
     let radius = f32::min(center_x, center_y) * 0.8;
 
     // Create a shared signal for tooltip state that all curves can access
-    let tooltip_state = use_signal(|| None::<TooltipData>);
+    let mut tooltip_state = use_signal(|| None::<TooltipData>);
 
     // Generate curves for each data set
     let curve_components = props.curves.iter().enumerate().map(|(curve_idx, curve)| {
@@ -105,18 +126,70 @@ pub fn RadarGraph(props: RadarGraphProps) -> Element {
         }
     });
 
-    // Generate tooltip component based on shared state
+    // Handle tooltip editing events
+    let mut tooltip_state_for_handlers = tooltip_state;
+
+    let handle_start_edit = move |_| {
+        let current = tooltip_state_for_handlers.read().clone();
+        if let Some(mut data) = current {
+            data.editing = true;
+            tooltip_state_for_handlers.set(Some(data));
+        }
+    };
+
+    let handle_complete_edit = {
+        let on_value_change = props.on_value_change;
+        let mut tooltip_state_for_complete = tooltip_state;
+
+        move |new_value: f32| {
+            let current = tooltip_state_for_complete.read().clone();
+            if let Some(mut data) = current {
+                // Call the value change callback if provided
+                if let Some(callback) = &on_value_change {
+                    callback.call((data.curve_index, data.point_index, new_value));
+                }
+
+                // Update the tooltip data and stop editing
+                data.value = new_value;
+                data.editing = false;
+                data.label = format!(
+                    "{}: {}",
+                    data.label.split(':').next().unwrap_or(""),
+                    new_value
+                );
+                tooltip_state_for_complete.set(Some(data));
+            }
+        }
+    };
+
+    let handle_cancel_edit = move |_| {
+        let current = tooltip_state.read().clone();
+        if let Some(mut data) = current {
+            data.editing = false;
+            tooltip_state.set(Some(data));
+        }
+    };
+
+    // Generate editable tooltip component based on shared state
     let tooltip = {
         let tooltip_info = tooltip_state.read();
 
         if let Some(data) = &*tooltip_info {
             rsx! {
-                Tooltip {
+                EditableTooltip {
                     x: data.x,
                     y: data.y,
                     content: data.label.clone(),
+                    value: data.value,
+                    curve_index: data.curve_index,
+                    point_index: data.point_index,
                     visible: true,
-                    pinned: data.pinned
+                    pinned: data.pinned,
+                    editing: data.editing,
+                    color: data.color.clone(),
+                    on_start_edit: handle_start_edit,
+                    on_complete_edit: handle_complete_edit,
+                    on_cancel_edit: handle_cancel_edit,
                 }
             }
         } else {

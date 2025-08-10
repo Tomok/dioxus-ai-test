@@ -9,10 +9,14 @@ pub struct DataPointProps {
     pub y: f32,
     /// Index of the curve this point belongs to
     pub curve_index: usize,
+    /// Index of this point within the curve
+    pub point_index: usize,
     /// Color of the curve/point
     pub color: String,
     /// Content to display in the tooltip
     pub tooltip_content: String,
+    /// Current value of the data point
+    pub value: f32,
     /// Shared tooltip state
     pub tooltip_state: Signal<Option<TooltipData>>,
 }
@@ -43,29 +47,35 @@ pub fn DataPoint(props: DataPointProps) -> Element {
         let current_tooltip = tooltip_state_click.read().clone();
 
         // Check if this is the same data point and it's already pinned
-        let is_same_point_and_pinned = current_tooltip
-            .as_ref()
-            .is_some_and(|t| t.curve_index == curve_idx && t.x == x && t.y == y && t.pinned);
+        let is_same_point_and_pinned = current_tooltip.as_ref().is_some_and(|t| {
+            t.curve_index == curve_idx && t.point_index == props.point_index && t.pinned
+        });
 
         if is_same_point_and_pinned {
             // If it's already pinned, unpin it
             tooltip_state_click.set(Some(TooltipData {
                 curve_index: curve_idx,
+                point_index: props.point_index,
                 label: tooltip_content_click.clone(),
+                value: props.value,
                 x,
                 y,
                 color: color_click.clone(),
                 pinned: false,
+                editing: false,
             }));
         } else {
-            // Otherwise, pin it (overriding any other pinned tooltip)
+            // Otherwise, pin it and immediately enter edit mode (overriding any other pinned tooltip)
             tooltip_state_click.set(Some(TooltipData {
                 curve_index: curve_idx,
+                point_index: props.point_index,
                 label: tooltip_content_click.clone(),
+                value: props.value,
                 x,
                 y,
                 color: color_click.clone(),
                 pinned: true,
+                editing: true,
             }));
         }
     };
@@ -79,11 +89,14 @@ pub fn DataPoint(props: DataPointProps) -> Element {
         {
             tooltip_state_enter.set(Some(TooltipData {
                 curve_index: curve_idx,
+                point_index: props.point_index,
                 label: tooltip_content_enter.clone(),
+                value: props.value,
                 x,
                 y,
                 color: color_enter.clone(),
                 pinned: false,
+                editing: false,
             }));
         }
     };
