@@ -134,3 +134,74 @@ npx tailwindcss -i ./tailwind.css -o ./assets/tailwind.css
   nix develop --command cargo clippy
   ```
   These commands are REQUIRED and must be run before any commit. Never commit code without formatting and fixing all clippy issues.
+
+## Agent-Specific Documentation System
+
+This project includes comprehensive documentation designed for different types of AI agents and specialists. This documentation system helps future agent executions understand the codebase structure, patterns, and domain-specific knowledge.
+
+### Documentation Schema
+
+#### 1. Root-Level Specialized Documentation
+- **`CLAUDE-RUST-EXPERT.md`**: Rust architecture, component patterns, state management, and advanced Rust techniques
+- **`CLAUDE-TAILWIND-CSS.md`**: Styling system, dark mode implementation, responsive design patterns, and CSS architecture
+- **`CLAUDE-NIX-FLAKE.md`**: Development environment, build system, dependency management, and Nix configuration
+- **`CLAUDE-GENERAL.md`**: Project overview, features, user experience, and overall architecture
+
+#### 2. Directory-Specific Documentation
+Each relevant directory contains agent-specific documentation with the same naming pattern:
+- **`src/CLAUDE-<AGENT-NAME>.md`**: Source-level patterns and organization
+- **`src/components/CLAUDE-<AGENT-NAME>.md`**: Component-specific patterns and architecture
+- **`src/components/radar/CLAUDE-<AGENT-NAME>.md`**: Feature-specific deep dives
+- **`assets/CLAUDE-<AGENT-NAME>.md`**: Asset management and resource organization
+
+#### 3. Agent Specialization Areas
+
+**Rust Expert Agent:**
+- Component architecture and hierarchy
+- Signal-based state management patterns  
+- Error handling and validation strategies
+- Memory management and performance optimizations
+- Platform abstraction techniques
+
+**Tailwind CSS Specialist:**
+- Utility-first styling approach
+- Dark mode implementation strategies
+- Responsive design patterns
+- Custom CSS integration points
+- Performance optimization techniques
+
+**Nix Flake Architect:**
+- Development environment configuration
+- Cross-platform dependency management
+- Build system integration
+- Version synchronization strategies
+- Performance and caching optimizations
+
+**General Purpose Agent:**
+- Overall project structure and workflows
+- User experience design patterns
+- Feature documentation and usage
+- Integration patterns and best practices
+- Maintenance and evolution guidelines
+
+### Using This Documentation
+
+#### For Future Agent Interactions
+1. **Domain-Specific Tasks**: Read the relevant `CLAUDE-<AGENT-NAME>.md` files for specialized knowledge
+2. **Component Work**: Check both root and directory-specific documentation for context
+3. **Cross-Domain Tasks**: Review multiple agent documentation files for comprehensive understanding
+4. **Architecture Decisions**: Reference the appropriate specialized documentation for design patterns
+
+#### For Human Developers
+1. **Onboarding**: Start with `CLAUDE-GENERAL.md` for project overview
+2. **Specific Domains**: Deep dive into specialized documentation for detailed patterns
+3. **Component Development**: Use directory-specific files for local context and patterns
+4. **Maintenance**: Reference documentation when making changes to understand impact
+
+#### Documentation Maintenance
+- Update documentation when making significant architectural changes
+- Keep specialized documentation synchronized with code changes
+- Add new agent-specific files when introducing new domains or technologies
+- Maintain consistency in documentation structure and depth across all agent files
+
+This documentation system ensures that future AI agents have comprehensive, specialized knowledge to work effectively within this codebase while maintaining consistency with established patterns and practices.
